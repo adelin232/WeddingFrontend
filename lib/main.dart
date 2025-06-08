@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:nunta_aa/upload_page.dart';
 import 'package:nunta_aa/wedding_background.dart';
 
@@ -37,6 +38,39 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  late Duration _timeLeft;
+  late final DateTime _weddingDate;
+  late final Ticker _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _weddingDate = DateTime(2026, 8, 29, 0, 0, 0);
+    _timeLeft = _weddingDate.difference(DateTime.now());
+    _ticker = Ticker(_updateCountdown)..start();
+  }
+
+  void _updateCountdown(Duration _) {
+    final now = DateTime.now();
+    setState(() {
+      _timeLeft = _weddingDate.difference(now);
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  String _formatDuration(Duration d) {
+    final days = d.inDays;
+    final hours = d.inHours % 24;
+    final minutes = d.inMinutes % 60;
+    final seconds = d.inSeconds % 60;
+    return '$days zile, $hours ore, $minutes min, $seconds sec';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,6 +103,29 @@ class _MyHomePageState extends State<MyHomePage> {
                       textStyle: const TextStyle(fontSize: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'Până la nuntă au mai rămas:',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.deepPurple[700],
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 500),
+                    child: Text(
+                      _formatDuration(_timeLeft),
+                      key: ValueKey(_timeLeft.inSeconds),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                        letterSpacing: 1.2,
                       ),
                     ),
                   ),
