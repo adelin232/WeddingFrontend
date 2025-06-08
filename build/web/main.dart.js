@@ -63530,8 +63530,8 @@ A.vn.prototype={
 V(a){var s=null,r=new A.a0M().$0()
 return A.Fu(B.cX,A.a([new A.nq(A.adN(s,s,new A.q7(r,s,s)),s,s,B.w3,s),A.A1(s,s,A.ak(51,0,0,0),s,s,s,s,s),this.c],t.F),B.Hc)}}
 A.a0M.prototype={
-$0(){A.a7G().$1("BACKGROUND_WEB: ")
-return""},
+$0(){A.a7G().$1("BACKGROUND_WEB: https://wedding-photographs-aa.s3.us-east-1.amazonaws.com/background_web.jpeg")
+return"https://wedding-photographs-aa.s3.us-east-1.amazonaws.com/background_web.jpeg"},
 $S:20}
 A.Wt.prototype={
 PR(a){$.a7V().l(0,this,a)}}

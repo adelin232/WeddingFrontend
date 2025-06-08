@@ -28,17 +28,9 @@ class WeddingBackground extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         Image.asset(
-            kIsWeb
-              ? (() {
-                const bgWeb = String.fromEnvironment('BACKGROUND_WEB');
-                debugPrint('BACKGROUND_WEB: $bgWeb');
-                return bgWeb;
-              })()
-              : (() {
-                const bg = String.fromEnvironment('BACKGROUND');
-                debugPrint('BACKGROUND: $bg');
-                return bg;
-              })(),
+          kIsWeb
+              ? const String.fromEnvironment('BACKGROUND_WEB')
+              : const String.fromEnvironment('BACKGROUND'),
           fit: BoxFit.cover,
         ),
         Container(
