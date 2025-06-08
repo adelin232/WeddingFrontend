@@ -27,12 +27,20 @@ class WeddingBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        Image.asset(
-          kIsWeb
-              ? const String.fromEnvironment('BACKGROUND_WEB')
-              : const String.fromEnvironment('BACKGROUND'),
-          fit: BoxFit.cover,
-        ),
+        kIsWeb
+            ? Image.network(
+              const String.fromEnvironment('BACKGROUND_WEB'),
+                fit: BoxFit.cover,
+                // Debug print for environment variable
+                loadingBuilder: (context, child, loadingProgress) {
+                debugPrint('BACKGROUND_WEB: ${const String.fromEnvironment('BACKGROUND_WEB')}');
+                return child;
+                },
+              )
+            : Image.asset(
+                const String.fromEnvironment('BACKGROUND'),
+                fit: BoxFit.cover,
+              ),
         Container(
           color: Colors.black.withOpacity(0.2), // overlay pentru lizibilitate
         ),
