@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nunta_aa/wedding_background.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 
 class UploadPage extends StatefulWidget {
   const UploadPage({super.key});
@@ -52,7 +51,8 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future<void> _submitImages() async {
-    final uri = Uri.parse('https://YOUR_API_GATEWAY_ENDPOINT/upload');
+    final uri = Uri.parse(const String.fromEnvironment('UPLOAD_URL',
+        defaultValue: 'https://YOUR_API_GATEWAY_ENDPOINT/upload'));
     final messenger = ScaffoldMessenger.of(context);
     try {
       var request = http.MultipartRequest('POST', uri);
@@ -64,7 +64,6 @@ class _UploadPageState extends State<UploadPage> {
               'files', // cheie pentru fiecare fișier
               _webImages[i],
               filename: 'image_$i.jpg',
-              contentType: MediaType('image', 'jpeg'),
             ),
           );
         }
@@ -152,7 +151,8 @@ class _UploadPageState extends State<UploadPage> {
                       child: Listener(
                         onPointerSignal: (pointerSignal) {
                           if (pointerSignal is PointerScrollEvent) {
-                            final newOffset = _scrollController.offset + pointerSignal.scrollDelta.dy;
+                            final newOffset = _scrollController.offset +
+                                pointerSignal.scrollDelta.dy;
                             _scrollController.jumpTo(
                               newOffset.clamp(
                                 0.0,
@@ -167,8 +167,11 @@ class _UploadPageState extends State<UploadPage> {
                           child: ListView.separated(
                             controller: _scrollController,
                             scrollDirection: Axis.horizontal,
-                            itemCount: kIsWeb ? _webImages.length : _selectedImages.length,
-                            separatorBuilder: (_, __) => const SizedBox(width: 12),
+                            itemCount: kIsWeb
+                                ? _webImages.length
+                                : _selectedImages.length,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(width: 12),
                             itemBuilder: (context, index) {
                               return ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
@@ -199,7 +202,8 @@ class _UploadPageState extends State<UploadPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 14),
                         textStyle: const TextStyle(fontSize: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),

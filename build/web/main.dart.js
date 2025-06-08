@@ -63533,16 +63533,16 @@ case 4:return A.X(null,r)}})
 return A.Y($async$n2,r)},
 qM(){var s=0,r=A.Z(t.H),q=1,p,o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4
 var $async$qM=A.T(function(a5,a6){if(a5===1){p=a6
-s=q}while(true)switch(s){case 0:a2=A.fR("https://YOUR_API_GATEWAY_ENDPOINT/upload")
+s=q}while(true)switch(s){case 0:a2=A.fR("https://76m4cc3u9j.execute-api.us-east-1.amazonaws.com/prod/upload")
 a3=o.c.ak(t.Pu)
 a3.toString
 n=a3.f
 q=3
 m=A.anc("POST",a2)
-for(l=0,a3=t.G5,i=t.zb,h=t.N,g=i.h("cS<1>");f=l,e=o.e,f<e.length;++l){f=m.y
+for(l=0,a3=t.zb,i=t.G5,h=t.N,g=a3.h("cS<1>");f=l,e=o.e,f<e.length;++l){f=m.y
 e=e[l]
 d=A.h(l)
-c=new A.hP(null,null,null,null,i)
+c=new A.hP(null,null,null,null,a3)
 b=c.q_()
 a=new A.kt(e)
 a0=b.c
@@ -63551,7 +63551,8 @@ else{a0.sk5(0,a)
 b.c=a}c.v7()
 e=J.b0(e)
 c=A.ahn(new A.jy(new A.cS(c,g)))
-f.push(new A.CL("files",e,"image_"+d+".jpg",new A.V5("image".toLowerCase(),"jpeg".toLowerCase(),new A.iX(A.z(h,h),a3)),c))}s=6
+b=new A.V5("application".toLowerCase(),"octet-stream".toLowerCase(),new A.iX(A.z(h,h),i))
+f.push(new A.CL("files",e,"image_"+d+".jpg",b,c))}s=6
 return A.V(J.ajU(m),$async$qM)
 case 6:k=a6
 if(k.b===200){n.uo(B.H8)
