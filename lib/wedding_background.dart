@@ -29,13 +29,8 @@ class WeddingBackground extends StatelessWidget {
       children: [
         kIsWeb
             ? Image.network(
-              const String.fromEnvironment('BACKGROUND_WEB'),
+                const String.fromEnvironment('BACKGROUND_WEB'),
                 fit: BoxFit.cover,
-                // Debug print for environment variable
-                loadingBuilder: (context, child, loadingProgress) {
-                debugPrint('BACKGROUND_WEB: ${const String.fromEnvironment('BACKGROUND_WEB')}');
-                return child;
-                },
               )
             : Image.asset(
                 const String.fromEnvironment('BACKGROUND'),
