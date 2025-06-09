@@ -89,10 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 1500),
             child: _showWelcome
-                ? const Align(
-                    alignment: Alignment(0, -0.33),
+                ? Align(
+                    alignment: const Alignment(0, -0.33),
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32),
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -100,9 +100,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             'Bine ai venit la nunta noastră!\n'
                             '            Andreea și Adelin',
                             style: TextStyle(
-                              fontSize: 32,
+                              fontSize: MediaQuery.of(context).size.width < 400
+                                  ? 24
+                                  : 32,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFFF5F5F5),
+                              color: const Color(0xFFF5F5F5),
                               fontFamily: 'DancingScript',
                               letterSpacing: 1.2,
                             ),

@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-// Conditional import for web
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html
     if (dart.library.io) 'gallery_page_stub.dart';
@@ -128,7 +127,6 @@ class GalleryPage extends StatelessWidget {
                                     );
                                   }
                                 } else {
-                                  // Pentru web (inclusiv browser pe telefon): deschide imaginea într-un tab nou
                                   // ignore: undefined_prefixed_name
                                   html.window.open(url, '_blank');
                                 }
@@ -138,10 +136,10 @@ class GalleryPage extends StatelessWidget {
                               top: 8,
                               left: 8,
                               child: IconButton(
-                                icon: CircleAvatar(
+                                icon: const CircleAvatar(
                                   backgroundColor: Colors.deepPurple,
                                   radius: 22,
-                                  child: const Icon(Icons.close,
+                                  child:  Icon(Icons.close,
                                       color: Colors.white, size: 24),
                                 ),
                                 onPressed: () => Navigator.of(context).pop(),
@@ -159,7 +157,7 @@ class GalleryPage extends StatelessWidget {
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: FittedBox(
-                      fit: BoxFit.scaleDown, // Zoom out efect
+                      fit: BoxFit.scaleDown,
                       child: Image.network(
                         Uri.encodeFull(url),
                         fit: BoxFit.contain,
