@@ -69334,7 +69334,7 @@ s===$&&A.b()
 s.m()
 this.aO()},
 M(a){var s,r,q,p,o,n,m,l,k,j=null
-if(this.r)s=new A.e6(B.wz,j,j,new A.dM(B.Au,A.aec(A.a([A.pO("Bine ai venit la nunta noastr\u0103!\n           Andreea & Adelin",j,A.l6(j,j,B.jW,j,j,j,j,j,"DancingScript",j,j,A.cb(a,j,t.w).w.a.a<500?12:32,j,j,B.ba,j,j,!0,j,1.2,j,j,j,j,j,j),B.eL)],t.G),B.bU,B.cN),j),j)
+if(this.r)s=new A.e6(B.wz,j,j,new A.dM(B.Au,A.aec(A.a([A.pO("Bine ai venit la nunta noastr\u0103!\n           Andreea & Adelin",j,A.l6(j,j,B.jW,j,j,j,j,j,"DancingScript",j,j,A.cb(a,j,t.w).w.a.a<500?24:32,j,j,B.ba,j,j,!0,j,1.2,j,j,j,j,j,j),B.eL)],t.G),B.bU,B.cN),j),j)
 else{s=A.hI(24)
 r=A.a0(217,255,255,255)
 q=A.a7C(B.kA,B.NM,this.gWm(),A.CT(j,j,B.aZ,j,j,j,j,j,j,B.i,j,j,B.fS,j,new A.bX(A.hI(16),B.u),j,j,B.eN,j))
