@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
             duration: const Duration(milliseconds: 1500),
             child: _showWelcome
                 ? Align(
-                    alignment: const Alignment(0, -0.33),
+                    alignment: const Alignment(0, -0.3),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32),
                       child: Column(
