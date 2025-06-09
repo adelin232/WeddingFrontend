@@ -98,10 +98,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text(
                             'Bine ai venit la nunta noastră!\n'
-                            '            Andreea și Adelin',
+                            '           Andreea & Adelin',
                             style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width < 400
-                                  ? 16
+                              fontSize: MediaQuery.of(context).size.width < 500
+                                  ? 12
                                   : 32,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFFF5F5F5),
