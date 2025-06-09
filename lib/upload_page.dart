@@ -61,9 +61,9 @@ class _UploadPageState extends State<UploadPage> {
         for (int i = 0; i < _webImages.length; i++) {
           request.files.add(
             http.MultipartFile.fromBytes(
-              'files', // cheie pentru fiecare fișier
+              'files',
               _webImages[i],
-              filename: 'image_$i.jpg',
+              filename: 'photographs/image_$i.jpg',
             ),
           );
         }
@@ -73,6 +73,7 @@ class _UploadPageState extends State<UploadPage> {
             await http.MultipartFile.fromPath(
               'files',
               _selectedImages[i].path,
+              filename: 'photographs/image_$i.jpg',
             ),
           );
         }
@@ -102,10 +103,17 @@ class _UploadPageState extends State<UploadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Încarcă fotografii'),
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      // ),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          onPressed: () => Navigator.of(context).pop(),
+          tooltip: 'Acasă',
+        ),
+        title: const Text('Încarcă Fotografii'),
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: WeddingBackground(
         child: Center(
           child: Card(
@@ -143,6 +151,7 @@ class _UploadPageState extends State<UploadPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 12),
                   if (_selectedImages.isNotEmpty || _webImages.isNotEmpty) ...[
                     const SizedBox(height: 20),
                     SizedBox(

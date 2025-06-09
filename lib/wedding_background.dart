@@ -28,10 +28,15 @@ class WeddingBackground extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         kIsWeb
-            ? Image.network(
+            ? (const String.fromEnvironment('FLUTTER_ENV') == 'development'
+              ? Image.asset(
+                'images/background_web.jpeg',
+                fit: BoxFit.cover,
+                )
+              : Image.network(
                 const String.fromEnvironment('BACKGROUND_WEB'),
                 fit: BoxFit.cover,
-              )
+                ))
             : Image.asset(
                 const String.fromEnvironment('BACKGROUND'),
                 fit: BoxFit.cover,
