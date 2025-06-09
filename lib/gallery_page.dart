@@ -76,7 +76,7 @@ class GalleryPage extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                   child: Image.network(
                     Uri.encodeFull(imageUrls[index]),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     loadingBuilder: (context, child, progress) =>
                         progress == null
                             ? child
