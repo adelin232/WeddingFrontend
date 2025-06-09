@@ -104,8 +104,12 @@ class GalleryPage extends StatelessWidget {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.download,
-                                  color: Colors.white, size: 32),
+                              icon: const CircleAvatar(
+                                backgroundColor: Colors.deepPurple,
+                                radius: 22,
+                                child:  Icon(Icons.download,
+                                    color: Colors.white, size: 24),
+                              ),
                               tooltip: 'Descarcă',
                               onPressed: () async {
                                 final messenger = ScaffoldMessenger.of(context);
@@ -113,7 +117,6 @@ class GalleryPage extends StatelessWidget {
                                     Theme.of(context).platform == TargetPlatform.iOS) {
                                   try {
                                     await ImageDownloader.downloadImage(url);
-                                    // Poți adăuga și un mesaj de succes
                                     messenger.showSnackBar(
                                       const SnackBar(content: Text('Imagine descărcată cu succes!')),
                                     );
@@ -123,6 +126,8 @@ class GalleryPage extends StatelessWidget {
                                     );
                                   }
                                 } else {
+                                  // Pentru web/desktop: deschide imaginea într-un tab nou
+                                  // ignore: undefined_prefixed_name
                                   html.window.open(url, '_blank');
                                 }
                               },
@@ -131,8 +136,12 @@ class GalleryPage extends StatelessWidget {
                               top: 8,
                               left: 8,
                               child: IconButton(
-                                icon: const Icon(Icons.close,
-                                    color: Colors.white, size: 32),
+                                icon: CircleAvatar(
+                                  backgroundColor: Colors.deepPurple,
+                                  radius: 22,
+                                  child: const Icon(Icons.close,
+                                      color: Colors.white, size: 24),
+                                ),
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                             ),
