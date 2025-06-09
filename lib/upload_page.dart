@@ -63,7 +63,7 @@ class _UploadPageState extends State<UploadPage> {
             http.MultipartFile.fromBytes(
               'files',
               _webImages[i],
-              filename: 'photographs/image_$i.jpg',
+              filename: 'image_$i.jpg',
             ),
           );
         }
@@ -73,7 +73,7 @@ class _UploadPageState extends State<UploadPage> {
             await http.MultipartFile.fromPath(
               'files',
               _selectedImages[i].path,
-              filename: 'photographs/image_$i.jpg',
+              filename: 'image_$i.jpg',
             ),
           );
         }

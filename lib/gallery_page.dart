@@ -10,8 +10,23 @@ class GalleryPage extends StatelessWidget {
         defaultValue: 'https://YOUR_API_GATEWAY_ENDPOINT/gallery');
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.cast<String>();
+      final data = json.decode(response.body);
+      // Dacă răspunsul este {"images": [...]}
+      if (data is Map && data['images'] is List) {
+        return List<String>.from(data['images']);
+      }
+      // Dacă răspunsul este direct o listă
+      if (data is List) {
+        return data.cast<String>();
+      }
+      // Dacă răspunsul este {"photos": [{...}]}
+      if (data is Map && data['photos'] is List) {
+        return (data['photos'] as List)
+            .where((photo) => photo is Map && photo['url'] != null)
+            .map<String>((photo) => photo['url'] as String)
+            .toList();
+      }
+      throw Exception('Format necunoscut de răspuns');
     } else {
       throw Exception('Nu s-au putut încărca imaginile');
     }
@@ -37,7 +52,7 @@ class GalleryPage extends StatelessWidget {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Eroare: ${snapshot.error}'));
+            return Center(child: Text('Eroare: ${snapshot.error.toString()}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Nu există imagini.'));
           }
@@ -51,16 +66,24 @@ class GalleryPage extends StatelessWidget {
             ),
             itemCount: imageUrls.length,
             itemBuilder: (context, index) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  imageUrls[index],
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) => progress == null
-                      ? child
-                      : const Center(child: CircularProgressIndicator()),
-                  errorBuilder: (context, error, stackTrace) =>
-                      const Center(child: Icon(Icons.broken_image, size: 48)),
+              return AspectRatio(
+                aspectRatio: 1,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.network(
+                    Uri.encodeFull(imageUrls[index]),
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) =>
+                        progress == null
+                            ? child
+                            : const Center(child: CircularProgressIndicator()),
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Center(child: Icon(Icons.broken_image, size: 48)),
+                  ),
                 ),
               );
             },
