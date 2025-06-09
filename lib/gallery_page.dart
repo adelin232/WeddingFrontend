@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 // Conditional import for web
 // ignore: avoid_web_libraries_in_flutter
@@ -113,8 +114,9 @@ class GalleryPage extends StatelessWidget {
                               tooltip: 'Descarcă',
                               onPressed: () async {
                                 final messenger = ScaffoldMessenger.of(context);
-                                if (Theme.of(context).platform == TargetPlatform.android ||
-                                    Theme.of(context).platform == TargetPlatform.iOS) {
+                                if (!kIsWeb &&
+                                    (Theme.of(context).platform == TargetPlatform.android ||
+                                     Theme.of(context).platform == TargetPlatform.iOS)) {
                                   try {
                                     await ImageDownloader.downloadImage(url);
                                     messenger.showSnackBar(
@@ -126,7 +128,7 @@ class GalleryPage extends StatelessWidget {
                                     );
                                   }
                                 } else {
-                                  // Pentru web/desktop: deschide imaginea într-un tab nou
+                                  // Pentru web (inclusiv browser pe telefon): deschide imaginea într-un tab nou
                                   // ignore: undefined_prefixed_name
                                   html.window.open(url, '_blank');
                                 }

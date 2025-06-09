@@ -90,7 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
             duration: const Duration(milliseconds: 1500),
             child: _showWelcome
                 ? const Align(
-                    alignment: Alignment(0, -0.35),
+                    alignment: Alignment(0, -0.33),
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 32),
                       child: Column(
@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           Text(
                             'Bine ai venit la nunta noastră!\n'
-                            '                   Andreea și Adelin',
+                            '            Andreea și Adelin',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 16),
                           Text(
                             'Până la nuntă au mai rămas:',
                             style: TextStyle(
