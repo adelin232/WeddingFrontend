@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             '            Andreea și Adelin',
                             style: TextStyle(
                               fontSize: MediaQuery.of(context).size.width < 400
-                                  ? 24
+                                  ? 16
                                   : 32,
                               fontWeight: FontWeight.bold,
                               color: const Color(0xFFF5F5F5),
