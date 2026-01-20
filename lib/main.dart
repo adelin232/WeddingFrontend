@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:nunta_aa/gallery_page.dart';
 import 'package:nunta_aa/upload_page.dart';
 import 'package:nunta_aa/wedding_background.dart';
+import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,10 +44,26 @@ class _MyHomePageState extends State<MyHomePage> {
   late final DateTime _weddingDate;
   late final Ticker _ticker;
   bool _showWelcome = true;
+  late VideoPlayerController _videoController;
+  final videoUrl = const String.fromEnvironment('VIDEO_URL');
 
   @override
   void initState() {
     super.initState();
+    _videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl))
+      ..initialize().then((_) {
+        setState(() {});
+        _videoController.play();
+      });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _showWelcome = false;
+          _videoController.pause();
+        });
+      }
+    });
     _weddingDate = DateTime(2026, 8, 29, 0, 0, 0);
     _timeLeft = _weddingDate.difference(DateTime.now());
     _ticker = Ticker(_updateCountdown)..start();
@@ -69,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void dispose() {
+    _videoController.dispose();
     _ticker.dispose();
     super.dispose();
   }
@@ -89,31 +107,12 @@ class _MyHomePageState extends State<MyHomePage> {
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 1500),
             child: _showWelcome
-                ? Align(
-                    alignment: const Alignment(0, -0.3),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 32),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Bine ai venit la nunta noastră!\n'
-                            '           Andreea & Adelin',
-                            style: TextStyle(
-                              fontSize: MediaQuery.of(context).size.width < 500
-                                  ? 24
-                                  : 32,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFF5F5F5),
-                              fontFamily: 'DancingScript',
-                              letterSpacing: 1.2,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
+                ? _videoController.value.isInitialized
+                    ? AspectRatio(
+                        aspectRatio: _videoController.value.aspectRatio,
+                        child: VideoPlayer(_videoController),
+                      )
+                    : const CircularProgressIndicator()
                 : Card(
                     key: const ValueKey('main'),
                     elevation: 8,
