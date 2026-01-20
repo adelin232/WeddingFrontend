@@ -69470,7 +69470,7 @@ return new A.o6(A.hI(16),new A.oC(A.ak1(s,s,new A.kJ(this.a.e[b],1)),s,100,100,B
 $S:443}
 A.xd.prototype={
 M(a){var s=null
-return A.wH(B.du,A.a([A.aeN("https://wedding-photographs-aa.s3.us-east-1.amazonaws.com/background_web.png",s,B.x_),A.iV(s,s,B.r,A.a0(51,0,0,0),s,s,s,s,s,s,s,s,s),this.c],t.G),B.IL)}}
+return A.wH(B.du,A.a([A.aeN("https://wedding-photographs-aa.s3.us-east-1.amazonaws.com/background_web.jpeg",s,B.x_),A.iV(s,s,B.r,A.a0(51,0,0,0),s,s,s,s,s,s,s,s,s),this.c],t.G),B.IL)}}
 A.T1.prototype={
 a21(a,b){var s,r,q=t._m
 A.amA("absolute",A.a([b,null,null,null,null,null,null,null,null,null,null,null,null,null,null],q))
