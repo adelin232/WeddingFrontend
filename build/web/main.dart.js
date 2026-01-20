@@ -69235,7 +69235,7 @@ A.oy.prototype={
 uv(){var s=0,r=A.X(t.yp),q,p,o,n,m
 var $async$uv=A.T(function(a,b){if(a===1)return A.U(b,r)
 while(true)switch(s){case 0:s=3
-return A.Y(A.aAE(A.fN("https://76m4cc3u9j.execute-api.us-east-1.amazonaws.com/prod/gallery")),$async$uv)
+return A.Y(A.aAE(A.fN("https://hcyl6gvp2d.execute-api.us-east-1.amazonaws.com/prod/gallery")),$async$uv)
 case 3:m=b
 if(m.b===200){p=B.bH.dQ(0,A.aAl(A.ayg(m.e).c.a.j(0,"charset")).dQ(0,m.w))
 o=t.f.b(p)
@@ -69396,7 +69396,7 @@ case 4:return A.V(null,r)}})
 return A.W($async$oh,r)},
 tr(){var s=0,r=A.X(t.H),q=1,p,o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4
 var $async$tr=A.T(function(a5,a6){if(a5===1){p=a6
-s=q}while(true)switch(s){case 0:a2=A.fN("https://76m4cc3u9j.execute-api.us-east-1.amazonaws.com/prod/upload")
+s=q}while(true)switch(s){case 0:a2=A.fN("https://hcyl6gvp2d.execute-api.us-east-1.amazonaws.com/prod/upload")
 a3=o.c.ac(t.Pu)
 a3.toString
 n=a3.f
@@ -69470,7 +69470,7 @@ return new A.o6(A.hI(16),new A.oC(A.ak1(s,s,new A.kJ(this.a.e[b],1)),s,100,100,B
 $S:443}
 A.xd.prototype={
 M(a){var s=null
-return A.wH(B.du,A.a([A.aeN("https://wedding-photographs-aa.s3.us-east-1.amazonaws.com/background_web.jpeg",s,B.x_),A.iV(s,s,B.r,A.a0(51,0,0,0),s,s,s,s,s,s,s,s,s),this.c],t.G),B.IL)}}
+return A.wH(B.du,A.a([A.aeN("https://wedding-photographs-aa.s3.us-east-1.amazonaws.com/background_web.png",s,B.x_),A.iV(s,s,B.r,A.a0(51,0,0,0),s,s,s,s,s,s,s,s,s),this.c],t.G),B.IL)}}
 A.T1.prototype={
 a21(a,b){var s,r,q=t._m
 A.amA("absolute",A.a([b,null,null,null,null,null,null,null,null,null,null,null,null,null,null],q))
