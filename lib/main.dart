@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-// Pachet pentru download pe mobil (dacă îl ai în pubspec)
+// Asigură-te că ai image_downloader în pubspec.yaml pentru mobil
 import 'package:image_downloader/image_downloader.dart';
 
 void main() {
@@ -55,35 +55,35 @@ class NewspaperLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const NewspaperHeader(),
-              const SizedBox(height: 30),
-              const HeroSection(),
-              const SectionDivider(),
-              const CountdownSection(targetDateStr: "2026-09-12 14:00:00"),
+              NewspaperHeader(),
+              SizedBox(height: 30),
+              HeroSection(),
+              SectionDivider(),
+              CountdownSection(targetDateStr: "2026-09-12 14:00:00"),
 
-              const SizedBox(height: 30),
+              SizedBox(height: 30),
               // --- SECȚIUNEA INTERACTIVĂ (Upload & Galerie) ---
-              const MemoriesSection(),
+              MemoriesSection(),
 
-              const SectionDivider(),
+              SectionDivider(),
               // --- SECȚIUNEA LOCAȚII (Refăcută) ---
-              const LocationsSection(),
-              const SectionDivider(),
+              LocationsSection(),
+              SectionDivider(),
 
-              const TimelineSection(),
-              const SizedBox(height: 30),
-              const DressCodeSection(),
-              const SizedBox(height: 40),
-              const RSVPCard(),
-              const SizedBox(height: 60),
-              const NewspaperFooter(),
+              TimelineSection(),
+              SizedBox(height: 30),
+              DressCodeSection(),
+              SizedBox(height: 40),
+              RSVPCard(),
+              SizedBox(height: 60),
+              NewspaperFooter(),
             ],
           ),
         ),
@@ -478,9 +478,8 @@ class GalleryPage extends StatelessWidget {
 
     // Fallback pentru demo daca nu e setat ENV
     if (apiUrl.contains("YOUR_API_GATEWAY")) {
-      await Future.delayed(const Duration(seconds: 1));
-      return List.generate(
-          6, (index) => 'https://picsum.photos/500/500?random=$index');
+      // Putem returna o listă goală sau demo, dar pentru a respecta logica ta strict:
+      // incercam request-ul, va da eroare 404/host not found si va fi prins in UI
     }
 
     final response = await http.get(Uri.parse(apiUrl));
