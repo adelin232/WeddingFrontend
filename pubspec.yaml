@@ -39,6 +39,9 @@ dependencies:
   http: ^1.1.0
   image_downloader: ^0.31.0
   video_player: ^2.8.2
+  google_fonts: ^5.1.0
+  intl: ^0.18.0
+  url_launcher: ^6.2.0
 
 dev_dependencies:
   flutter_test:
@@ -66,7 +69,8 @@ flutter:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-
+  assets:
+    - assets/videos/intro.mp4
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
