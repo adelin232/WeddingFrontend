@@ -26012,12 +26012,12 @@ case 2:return B.xg
 case 1:return B.xf
 case 3:return B.Le
 case 4:return B.xh}},
-an4(a,b){var s=0,r=A.U(t.y),q,p
-var $async$an4=A.O(function(c,d){if(c===1)return A.R(d,r)
+an4(a,b,c){var s=0,r=A.U(t.y),q,p
+var $async$an4=A.O(function(d,e){if(d===1)return A.R(e,r)
 while(true)switch(s){case 0:if(b===B.Fg||b===B.Fh)p=!(a.gdS()==="https"||a.gdS()==="http")
 else p=!1
 if(p)throw A.c(A.ee(a,"url","To use an in-app web view, you must provide an http(s) URL."))
-q=$.azq().tI(a.k(0),new A.IG(A.aLF(b),new A.In(!0,!0,B.tr),null))
+q=$.azq().tI(a.k(0),new A.IG(A.aLF(b),new A.In(!0,!0,B.tr),c))
 s=1
 break
 case 1:return A.S(q,r)}})
@@ -81957,7 +81957,7 @@ a6R(a){var s=0,r=A.U(t.H),q
 var $async$w4=A.O(function(b,c){if(b===1)return A.R(c,r)
 while(true)switch(s){case 0:q=A.eA("https://www.google.com/maps/search/?api=1&query="+A.E5(B.H_,a,B.K,!1),0,null)
 s=2
-return A.V(A.an4(q,B.ne),$async$w4)
+return A.V(A.an4(q,B.ne,null),$async$w4)
 case 2:if(!c)A.X3().$1("Nu s-a putut deschide harta pentru "+q.k(0))
 return A.S(null,r)}})
 return A.T($async$w4,r)},
@@ -82020,7 +82020,7 @@ f.push(new A.Jq("files",e,"image_"+d+".jpg",b,c))}s=6
 return A.V(J.aBA(m),$async$wX)
 case 6:k=a6
 o.af(new A.al4(o))
-if(k.b===200){n.v0(B.Nc)
+if(k.b===200){n.v0(B.Nd)
 o.af(new A.al5(o))}else n.v0(A.aps(null,null,null,null,null,B.a1,null,A.bq("Eroare la upload: "+k.b,null,null,null,null,null,null),B.dD,B.f4,null,null,null,null,null,null,null,null))
 q=1
 s=5
@@ -82103,28 +82103,28 @@ break}throw A.c(A.bM("Format necunoscut de r\u0103spuns"))}else throw A.c(A.bM("
 case 1:return A.S(q,r)}})
 return A.T($async$yk,r)},
 qB(a,b){return this.a1W(a,b)},
-a1W(a,b){var s=0,r=A.U(t.H),q=1,p,o,n,m,l,k,j,i
+a1W(a,b){var s=0,r=A.U(t.H),q=1,p,o,n,m,l,k,j,i,h
 var $async$qB=A.O(function(c,d){if(c===1){p=d
 s=q}while(true)switch(s){case 0:q=3
 s=6
 return A.V(A.axT(A.eA(b,0,null)),$async$qB)
 case 6:o=d
 if(o.b!==200)throw A.c("Eroare la desc\u0103rcare")
-k=o.w
-n=B.ld.ghX().cd(k)
-m="data:application/octet-stream;base64,"+A.i(n)
+n=o.w
+m=B.ld.ghX().cd(n)
+l=A.eA("data:application/octet-stream;base64,"+A.i(m),0,null)
 s=7
-return A.V(A.an4(A.eA(m,0,null),B.ne),$async$qB)
+return A.V(A.an4(l,B.ne,"nunta_amintire.jpg"),$async$qB)
 case 7:q=1
 s=5
 break
 case 3:q=2
-i=p
-l=A.ac(i)
-A.X3().$1("Eroare download: "+A.i(l))
-if(a.f!=null){k=a.ai(t.Pu)
-k.toString
-k.f.v0(B.Nd)}s=5
+h=p
+k=A.ac(h)
+A.X3().$1("Eroare download: "+A.i(k))
+if(a.f!=null){i=a.ai(t.Pu)
+i.toString
+i.f.v0(B.Nc)}s=5
 break
 case 2:s=1
 break
@@ -82164,7 +82164,7 @@ q.lN(A.aD8(null,B.J,!0,null,new A.a24(this.a,r,this.c),r,null,s,B.yW,!0,t.z))},
 $S:0}
 A.a24.prototype={
 $1(a){var s=null,r=this.b,q=A.bB(r,s,t.w).w,p=A.anY(2),o=this.c,n=t.p
-return new A.qu(B.B,B.mv,A.te(B.kW,A.a([A.cc(s,A.e6(A.a([A.HD(A.aoH(o,s,B.A7,s,s)),B.d7,A.afM(B.Ex,B.Sw,new A.a22(this.a,r,o),A.Hk(s,s,B.k,s,s,s,s,s,s,B.i,s,s,s,s,B.cz,s,s,s,s))],n),B.M,B.S,B.cj),B.n,s,new A.aw(0,800,0,q.a.b*0.8),new A.bz(B.i,s,s,p,s,s,B.Y),s,s,s,B.iy,s,s,s),A.Kt(s,A.aoE(s,B.Bl,s,new A.a23(r),s,s),s,s,s,10,10,s)],n),B.a1,B.d9),s)},
+return new A.qu(B.B,B.mv,A.te(B.kW,A.a([A.cc(s,A.e6(A.a([A.HD(A.aoH(o,s,B.A7,s,s)),B.d7,A.afM(B.Ex,B.Sv,new A.a22(this.a,r,o),A.Hk(s,s,B.k,s,s,s,s,s,s,B.i,s,s,s,s,B.cz,s,s,s,s))],n),B.M,B.S,B.cj),B.n,s,new A.aw(0,800,0,q.a.b*0.8),new A.bz(B.i,s,s,p,s,s,B.Y),s,s,s,B.iy,s,s,s),A.Kt(s,A.aoE(s,B.Bl,s,new A.a23(r),s,s),s,s,s,10,10,s)],n),B.a1,B.d9),s)},
 $S:493}
 A.a22.prototype={
 $0(){return this.a.qB(this.b,this.c)},
@@ -82178,7 +82178,7 @@ $3(a,b,c){return B.Ez},
 $S:494}
 A.Jc.prototype={
 J(a){var s=null,r=A.iP(B.C,B.u,1),q=A.K(B.c.b7(127.5),255,255,255),p=t.p
-return A.cc(s,A.e6(A.a([A.bq("COL\u021aUL AMINTIRILOR",s,s,s,A.ng().$1$fontSize(22),s,s),B.ew,A.bq("Ajuta\u021bi-ne s\u0103 colect\u0103m toate momentele frumoase!",s,s,s,A.cx().$1$fontStyle(B.aF),B.bh,s),B.d8,A.eY(A.a([A.HD(A.afM(B.Ey,B.Sy,new A.a5t(a),A.Hk(s,s,B.k,s,s,s,s,s,s,B.i,s,s,B.mt,s,B.cz,s,s,s,s))),B.k9,A.HD(A.avJ(B.EC,B.Sx,new A.a5u(a),A.ap5(s,s,s,s,s,s,s,s,s,B.k,s,s,B.mt,s,B.cz,B.dl,s,s,s,s)))],p),B.M,B.S,B.P)],p),B.M,B.S,B.P),B.n,s,s,new A.bz(q,s,r,s,s,s,B.Y),s,s,s,B.iA,s,s,s)}}
+return A.cc(s,A.e6(A.a([A.bq("COL\u021aUL AMINTIRILOR",s,s,s,A.ng().$1$fontSize(22),s,s),B.ew,A.bq("Ajuta\u021bi-ne s\u0103 colect\u0103m toate momentele frumoase!",s,s,s,A.cx().$1$fontStyle(B.aF),B.bh,s),B.d8,A.eY(A.a([A.HD(A.afM(B.Ey,B.Sx,new A.a5t(a),A.Hk(s,s,B.k,s,s,s,s,s,s,B.i,s,s,B.mt,s,B.cz,s,s,s,s))),B.k9,A.HD(A.avJ(B.EC,B.Sw,new A.a5u(a),A.ap5(s,s,s,s,s,s,s,s,s,B.k,s,s,B.mt,s,B.cz,B.dl,s,s,s,s)))],p),B.M,B.S,B.P)],p),B.M,B.S,B.P),B.n,s,s,new A.bz(q,s,r,s,s,s,B.Y),s,s,s,B.iA,s,s,s)}}
 A.a5t.prototype={
 $0(){var s=A.aoV(new A.a5s(),null,t.z)
 return A.os(this.a,!1).lN(s)},
@@ -82243,7 +82243,7 @@ vw(a){var s=null
 return A.cc(s,s,B.n,s,s,new A.bz(a,s,A.iP(B.cK,B.u,1),s,s,s,B.eO),s,24,B.f5,s,s,s,24)}}
 A.KB.prototype={
 J(a){var s=null,r=A.bq("Confirmati Prezenta",s,s,s,A.ng().$1$fontSize(28),s,s),q=A.bq("V\u0103 rug\u0103m s\u0103 ne confirma\u021bi prezen\u021ba p\xe2n\u0103 la data de 20 Iulie 2026",s,s,s,A.cx().$2$color$fontStyle(B.c8,B.aF),B.bh,s),p=A.ati(s,s,s,s,s,s,s,s,!0,B.TK,s,s,s,s,s,s,s,s,s,s,s,B.z_,s,s,s,s,s,s,s,s,s,s,s,!1,s,s,A.cx().$1$color(B.cR),"Nume Prenume",s,s,s,s,s,s,s,s,s,s,s,s,s),o=t.y,n=t.p
-return A.te(B.kW,A.a([A.cc(s,A.e6(A.a([r,q,B.d8,new A.Ae(p,B.Ob,B.N5,B.N6,!0,s),B.N0,A.eY(A.a([A.auj(!0,new A.a7o(),!0,o),A.bq("Vom participa",s,s,s,A.cx().$0(),s,s)],n),B.M,B.S,B.P),A.eY(A.a([A.auj(!0,new A.a7p(),!1,o),A.bq("Nu putem ajunge",s,s,s,A.cx().$0(),s,s)],n),B.M,B.S,B.P),B.d8,A.afM(B.EE,B.Sv,new A.a7q(),A.Hk(s,s,B.k,s,s,s,s,s,s,B.i,s,s,B.mz,s,B.cz,s,s,A.cx().$2$fontSize$letterSpacing(12,1.5),s))],n),B.M,B.S,B.P),B.n,B.dx,s,s,s,s,B.Dl,B.iA,s,s,s),A.Kt(s,A.Nb(B.I,0.2,A.cc(s,A.bq("RSVP",s,s,s,A.cx().$3$color$fontSize$fontWeight(B.i,12,B.ad),s,s),B.n,s,s,B.A0,s,s,s,B.iy,s,s,s),s),s,s,s,0,0,s)],n),B.a1,B.d9)}}
+return A.te(B.kW,A.a([A.cc(s,A.e6(A.a([r,q,B.d8,new A.Ae(p,B.Ob,B.N5,B.N6,!0,s),B.N0,A.eY(A.a([A.auj(!0,new A.a7o(),!0,o),A.bq("Vom participa",s,s,s,A.cx().$0(),s,s)],n),B.M,B.S,B.P),A.eY(A.a([A.auj(!0,new A.a7p(),!1,o),A.bq("Nu putem ajunge",s,s,s,A.cx().$0(),s,s)],n),B.M,B.S,B.P),B.d8,A.afM(B.EE,B.Su,new A.a7q(),A.Hk(s,s,B.k,s,s,s,s,s,s,B.i,s,s,B.mz,s,B.cz,s,s,A.cx().$2$fontSize$letterSpacing(12,1.5),s))],n),B.M,B.S,B.P),B.n,B.dx,s,s,s,s,B.Dl,B.iA,s,s,s),A.Kt(s,A.Nb(B.I,0.2,A.cc(s,A.bq("RSVP",s,s,s,A.cx().$3$color$fontSize$fontWeight(B.i,12,B.ad),s,s),B.n,s,s,B.A0,s,s,s,B.iy,s,s,s),s),s,s,s,0,0,s)],n),B.a1,B.d9)}}
 A.a7o.prototype={
 $1(a){},
 $S:92}
@@ -83016,7 +83016,8 @@ return this.tH(a,!0,!0,b.b.c,p===B.xh,r,r,b.d)}}
 A.ad5.prototype={
 ajh(a,b){var s,r=A.avn(a),q=r==null?null:r.gdS()
 if(B.Ml.p(0,q))return null
-s=this.b&&B.Ms.p(0,q)?"_top":""
+if(b==null)s=this.b&&B.Ms.p(0,q)?"_top":""
+else s=b
 return B.Uc.ajg(this.a,a,s,"noopener,noreferrer")},
 tH(a,b,c,d,e,f,g,h){return this.ahZ(a,!0,!0,d,e,f,g,h)},
 ahZ(a,b,c,d,e,f,g,h){var s=0,r=A.U(t.y),q,p=this
@@ -88212,10 +88213,10 @@ B.Na=new A.jr(3,"hide")
 B.VU=new A.jr(4,"remove")
 B.yw=new A.jr(5,"timeout")
 B.Nb=new A.ta(null,null,null,null,null,null,null,null,null,null,null,null,null)
+B.Sy=new A.fB("Eroare la preg\u0103tirea desc\u0103rc\u0103rii.",null,null,null,null,null,null,null,null)
+B.Nc=new A.mE(B.Sy,null,null,null,null,null,null,null,null,null,null,null,B.f4,null,null,B.dD,B.a1,null)
 B.Sq=new A.fB("Imaginile au fost trimise cu succes!",null,null,null,null,null,null,null,null)
-B.Nc=new A.mE(B.Sq,null,null,null,null,null,null,null,null,null,null,null,B.f4,null,null,B.dD,B.a1,null)
-B.Su=new A.fB("Eroare la procesarea imaginii.",null,null,null,null,null,null,null,null)
-B.Nd=new A.mE(B.Su,null,null,null,null,null,null,null,null,null,null,null,B.f4,null,null,B.dD,B.a1,null)
+B.Nd=new A.mE(B.Sq,null,null,null,null,null,null,null,null,null,null,null,B.f4,null,null,B.dD,B.a1,null)
 B.yx=new A.Md(0,"permissive")
 B.VV=new A.Md(1,"normal")
 B.ex=new A.zR(null,null,null,null,!1)
@@ -88588,10 +88589,10 @@ B.QF=new A.n(!0,B.k,null,null,null,null,null,null,null,null,null,null,null,null,
 B.Ss=new A.fB("SELECTEAZ\u0102 FOTOGRAFII",null,B.QF,null,null,null,null,null,null)
 B.Oo=new A.n(!0,B.k,null,null,null,null,null,B.ad,null,null,null,null,null,null,null,null,null,B.ke,null,null,null,null,null,null,null,null)
 B.St=new A.fB("NAVIGHEAZ\u0102",null,B.Oo,null,null,null,null,null,null)
-B.Sv=new A.fB("TRIMITE CONFIRMAREA",null,null,null,null,null,null,null,null)
-B.Sw=new A.fB("DESCARC\u0102",null,null,null,null,null,null,null,null)
-B.Sx=new A.fB("VEZI GALERIE",null,null,null,null,null,null,null,null)
-B.Sy=new A.fB("\xceNCARC\u0102 POZE",null,null,null,null,null,null,null,null)
+B.Su=new A.fB("TRIMITE CONFIRMAREA",null,null,null,null,null,null,null,null)
+B.Sv=new A.fB("DESCARC\u0102",null,null,null,null,null,null,null,null)
+B.Sw=new A.fB("VEZI GALERIE",null,null,null,null,null,null,null,null)
+B.Sx=new A.fB("\xceNCARC\u0102 POZE",null,null,null,null,null,null,null,null)
 B.VW=new A.acr(0,"system")
 B.Kd=new A.j(0.056,0.024)
 B.K2=new A.j(0.108,0.3085)

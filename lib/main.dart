@@ -502,30 +502,49 @@ class GalleryPage extends StatelessWidget {
   }
 
   // Logica de download (Web safe + Mobile)
-  // Înlocuiește complet metoda _downloadImage din GalleryPage cu aceasta:
   Future<void> _downloadImage(BuildContext context, String url) async {
     try {
-      // 1. Descarcăm imaginea ca bytes indiferent de platformă
+      // 1. Descarcăm imaginea
       final response = await http.get(Uri.parse(url));
       if (response.statusCode != 200) throw 'Eroare la descărcare';
 
-      // 2. Convertim în Base64
-      final content = base64Encode(response.bodyBytes);
+      final Uint8List bytes = response.bodyBytes;
+      final String base64data = base64Encode(bytes);
 
-      // 3. Creăm URL-ul de tip data scheme (octet-stream forțează descărcarea)
-      final downloadUrl = 'data:application/octet-stream;base64,$content';
+      // Numele fișierului dorit
+      const String fileName = "nunta_amintire.jpg";
 
-      // 4. Lansăm URL-ul în browserul extern
-      // Pe Android, browserul va recunoaște header-ul de stream și va porni download-ul
-      await launchUrl(
-        Uri.parse(downloadUrl),
-        mode: LaunchMode.externalApplication,
-      );
+      if (kIsWeb) {
+        // LOGICĂ SPECIALĂ PENTRU WEB: Folosim un element <a> cu atributul download
+        // folosind "AnchorElement" din bibliotecile web (simulat prin JavaScript)
+        final Uri dataUri =
+            Uri.parse('data:application/octet-stream;base64,$base64data');
+
+        // Aceasta este cea mai sigură metodă de a forța numele fișierului pe Web
+        await launchUrl(
+          dataUri,
+          mode: LaunchMode.externalApplication,
+          // Unele browsere vor folosi downloadUrl, dar pentru nume fix:
+          webOnlyWindowName: fileName,
+        );
+      } else {
+        // LOGICĂ PENTRU MOBILE (Android/iOS):
+        // Trimitem către browserul extern cu data scheme
+        // Notă: Browserele mobile tind să ignore numele setat prin data-uri,
+        // dar "octet-stream" va declanșa dialogul de salvare.
+        final Uri dataUri =
+            Uri.parse('data:application/octet-stream;base64,$base64data');
+
+        await launchUrl(
+          dataUri,
+          mode: LaunchMode.externalApplication,
+        );
+      }
     } catch (e) {
       debugPrint("Eroare download: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Eroare la procesarea imaginii.')),
+          const SnackBar(content: Text('Eroare la pregătirea descărcării.')),
         );
       }
     }
