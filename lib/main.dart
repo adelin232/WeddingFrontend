@@ -520,37 +520,55 @@ class GalleryPage extends StatelessWidget {
   // Logica de download (Web safe + Mobile)
   Future<void> _downloadImage(BuildContext context, String url) async {
     try {
-      // Adăugăm un parametru în URL care uneori ajută la evitarea cache-ului
-      final String downloadUrl =
-          url.contains('?') ? '$url&download=1' : '$url?download=1';
-      final Uri uri = Uri.parse(downloadUrl);
+      // 1. Arătăm un mesaj că procesarea a început
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Se pregătește descărcarea...'),
+            duration: Duration(seconds: 1)),
+      );
+
+      // 2. Descarcăm datele brute ale imaginii via HTTP
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) throw 'Eroare la server';
+
+      final Uint8List bytes = response.bodyBytes;
+      final String base64data = base64Encode(bytes);
+
+      // Numele fișierului pe care îl va avea la salvare
+      const String fileName = "amintire_nunta_AA.jpg";
+
+      // 3. Creăm un "Data URI" cu tipul application/octet-stream
+      // Acest MIME type forțează browserul să descarce fișierul, nu să-l afișeze
+      final String downloadDataUrl =
+          'data:application/octet-stream;base64,$base64data';
 
       if (kIsWeb) {
-        // Pe Web, încercăm să forțăm descărcarea folosind un element de ancoră invizibil
-        // Acesta este cel mai bun mod de a seta numele fișierului: "nunta_amintire.jpg"
+        // Pe WEB: Folosim o metodă care simulează click-ul pe un element <a> cu atributul 'download'
+        // url_launcher suportă lansarea de data URIs
         await launchUrl(
-          uri,
+          Uri.parse(downloadDataUrl),
           mode: LaunchMode.externalApplication,
-          webOnlyWindowName: '_blank',
+          webOnlyWindowName: fileName, // Sugestie de nume pentru browser
         );
       } else {
-        // Pe Android/iOS: Descheidem URL-ul direct în browserul extern.
-        // Dacă S3 are Content-Disposition setat, se va descărca automat.
-        // Dacă nu, se va deschide imaginea și utilizatorul dă "Save Image".
+        // Pe ANDROID/IOS:
+        // Deoarece link-urile de tip "data:" pot fi mari și unele browsere mobile le blochează,
+        // varianta cea mai sigură pentru a avea numele dorit pe mobil este salvarea temporară.
+        // Dacă vrei să rămâi la varianta fără permisiuni (prin browser), folosim launchUrl:
+
+        final Uri uri = Uri.parse(downloadDataUrl);
         if (await canLaunchUrl(uri)) {
-          await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
         } else {
-          throw 'Nu s-a putut lansa URL-ul';
+          throw 'Nu s-a putut porni descărcarea';
         }
       }
     } catch (e) {
-      debugPrint("Eroare download: $e");
+      debugPrint("Eroare detaliată download: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Eroare: $e')),
+          const SnackBar(
+              content: Text('Eroare la descărcare. Verificați conexiunea.')),
         );
       }
     }
@@ -1302,20 +1320,6 @@ class _RSVPCardState extends State<RSVPCard> {
           ),
         )
       ],
-    );
-  }
-
-  Widget _buildInput(String hint) {
-    return TextField(
-      cursorColor: Colors.black,
-      decoration: InputDecoration(
-        labelText: hint,
-        labelStyle: GoogleFonts.playfairDisplay(color: Colors.grey),
-        enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey)),
-        focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.black)),
-      ),
     );
   }
 }
