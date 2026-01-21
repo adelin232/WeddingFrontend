@@ -563,24 +563,39 @@ class GalleryPage extends StatelessWidget {
               final url = imageUrls[index];
               return GestureDetector(
                 onTap: () {
-                  // Dialogul original "Polaroid"
                   showDialog(
                     context: context,
                     builder: (_) => Dialog(
                       backgroundColor: Colors.transparent,
+                      insetPadding: const EdgeInsets.all(10),
                       child: Stack(
                         alignment: Alignment.topRight,
                         children: [
+                          // Adăugăm un Container cu constrângeri pentru a limita mărimea pe Web
                           Container(
+                            constraints: BoxConstraints(
+                              // Limitează înălțimea la 80% din ecran pentru a nu fi foarte lungi
+                              maxHeight:
+                                  MediaQuery.of(context).size.height * 0.8,
+                              // Limitează lățimea pe desktop
+                              maxWidth: 800,
+                            ),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(2),
                             ),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                              mainAxisSize: MainAxisSize
+                                  .min, // Forțează coloana să fie cât conținutul
                               children: [
-                                Image.network(url, fit: BoxFit.contain),
+                                Expanded(
+                                  child: Image.network(
+                                    url,
+                                    fit: BoxFit
+                                        .contain, // Asigură că imaginea nu se taie
+                                  ),
+                                ),
                                 const SizedBox(height: 10),
                                 ElevatedButton.icon(
                                   onPressed: () => _downloadImage(context, url),
@@ -597,11 +612,18 @@ class GalleryPage extends StatelessWidget {
                               ],
                             ),
                           ),
-                          IconButton(
-                            icon: const CircleAvatar(
+                          // Butonul de închidere poziționat peste container
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: IconButton(
+                              icon: const CircleAvatar(
                                 backgroundColor: Colors.black,
-                                child: Icon(Icons.close, color: Colors.white)),
-                            onPressed: () => Navigator.pop(context),
+                                child: Icon(Icons.close,
+                                    color: Colors.white, size: 20),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                            ),
                           )
                         ],
                       ),
