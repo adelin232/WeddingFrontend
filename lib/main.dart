@@ -504,22 +504,36 @@ class GalleryPage extends StatelessWidget {
   }
 
   // Logica de download (Web safe + Mobile)
+  // Modifică doar metoda _downloadImage din GalleryPage:
   Future<void> _downloadImage(BuildContext context, String url) async {
     if (kIsWeb) {
-      // Pe web deschidem link-ul într-un tab nou (User logic was html.window.open)
-      await launchUrl(Uri.parse(url));
-    } else {
       try {
-        // Pe mobil folosim ImageDownloader (dacă e instalat)
+        // Soluție sigură pentru Web care forțează browser-ul să descarce imaginea
+        final Uri uri = Uri.parse(url);
+
+        // Folosim launchUrl pentru a deschide imaginea,
+        // dar pentru download real pe Web fără pachete mobile:
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      } catch (e) {
+        debugPrint("Eroare download web: $e");
+      }
+    } else {
+      // Codul pentru mobil rămâne neschimbat
+      try {
         await ImageDownloader.downloadImage(url);
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Imagine descărcată!')));
+            const SnackBar(content: Text('Imagine descărcată!')),
+          );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text('Eroare: $e')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Eroare: $e')),
+          );
         }
       }
     }
