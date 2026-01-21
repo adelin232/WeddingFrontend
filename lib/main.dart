@@ -9,8 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
-// Asigură-te că ai image_downloader în pubspec.yaml pentru mobil
-import 'package:image_downloader/image_downloader.dart';
 
 void main() {
   runApp(const MyApp());
@@ -506,35 +504,25 @@ class GalleryPage extends StatelessWidget {
   // Logica de download (Web safe + Mobile)
   // Modifică doar metoda _downloadImage din GalleryPage:
   Future<void> _downloadImage(BuildContext context, String url) async {
-    if (kIsWeb) {
-      try {
-        // Soluție sigură pentru Web care forțează browser-ul să descarce imaginea
-        final Uri uri = Uri.parse(url);
+    final Uri uri = Uri.parse(url);
 
-        // Folosim launchUrl pentru a deschide imaginea,
-        // dar pentru download real pe Web fără pachete mobile:
+    try {
+      // Folosim launchUrl pentru TOATE platformele ca metodă de fallback sigură
+      // Pe Android/iOS va deschide browserul care gestionează singur permisiunile de download
+      if (await canLaunchUrl(uri)) {
         await launchUrl(
           uri,
           mode: LaunchMode.externalApplication,
         );
-      } catch (e) {
-        debugPrint("Eroare download web: $e");
+      } else {
+        throw 'Nu s-a putut lansa URL-ul';
       }
-    } else {
-      // Codul pentru mobil rămâne neschimbat
-      try {
-        await ImageDownloader.downloadImage(url);
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Imagine descărcată!')),
-          );
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Eroare: $e')),
-          );
-        }
+    } catch (e) {
+      debugPrint("Eroare download: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Eroare la deschidere: $e')),
+        );
       }
     }
   }
