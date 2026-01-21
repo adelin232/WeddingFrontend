@@ -10,6 +10,12 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
+import 'package:path_provider/path_provider.dart'; // Pentru a gasi calea pe mobil
+import 'package:share_plus/share_plus.dart'; // Pentru a salva/partaja pe mobil
+
+// Import condiționat: încarcă helper-ul de web DOAR dacă e web
+import 'stub_download_helper.dart'
+    if (dart.library.html) 'web_download_helper.dart';
 
 void setupMape() {
   // 1. Cununia Civilă - Conacul Marghiloman
@@ -520,55 +526,42 @@ class GalleryPage extends StatelessWidget {
   // Logica de download (Web safe + Mobile)
   Future<void> _downloadImage(BuildContext context, String url) async {
     try {
-      // 1. Arătăm un mesaj că procesarea a început
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Se pregătește descărcarea...'),
+            content: Text('Se procesează imaginea...'),
             duration: Duration(seconds: 1)),
       );
 
-      // 2. Descarcăm datele brute ale imaginii via HTTP
+      // 1. Descarcă imaginea de pe net (comun pt ambele)
       final response = await http.get(Uri.parse(url));
-      if (response.statusCode != 200) throw 'Eroare la server';
+      if (response.statusCode != 200) throw 'Eroare server';
 
       final Uint8List bytes = response.bodyBytes;
-      final String base64data = base64Encode(bytes);
-
-      // Numele fișierului pe care îl va avea la salvare
-      const String fileName = "amintire_nunta_AA.jpg";
-
-      // 3. Creăm un "Data URI" cu tipul application/octet-stream
-      // Acest MIME type forțează browserul să descarce fișierul, nu să-l afișeze
-      final String downloadDataUrl =
-          'data:application/octet-stream;base64,$base64data';
+      final String fileName =
+          "amintire_nunta_${DateTime.now().millisecondsSinceEpoch}.jpg";
 
       if (kIsWeb) {
-        // Pe WEB: Folosim o metodă care simulează click-ul pe un element <a> cu atributul 'download'
-        // url_launcher suportă lansarea de data URIs
-        await launchUrl(
-          Uri.parse(downloadDataUrl),
-          mode: LaunchMode.externalApplication,
-          webOnlyWindowName: fileName, // Sugestie de nume pentru browser
-        );
+        // LOGICA WEB (Nume corect + Download automat)
+        downloadWeb(bytes, fileName); // Apelează funcția din helper
       } else {
-        // Pe ANDROID/IOS:
-        // Deoarece link-urile de tip "data:" pot fi mari și unele browsere mobile le blochează,
-        // varianta cea mai sigură pentru a avea numele dorit pe mobil este salvarea temporară.
-        // Dacă vrei să rămâi la varianta fără permisiuni (prin browser), folosim launchUrl:
+        // LOGICA MOBIL (Fără crash-uri)
+        // 1. Găsim folderul temporar al telefonului
+        final tempDir = await getTemporaryDirectory();
+        final file = File('${tempDir.path}/$fileName');
 
-        final Uri uri = Uri.parse(downloadDataUrl);
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-        } else {
-          throw 'Nu s-a putut porni descărcarea';
-        }
+        // 2. Scriem imaginea pe disc
+        await file.writeAsBytes(bytes);
+
+        // 3. Deschidem meniul de Share/Save
+        // Utilizatorul va alege "Save Image" sau "Save to Files"
+        await Share.shareXFiles([XFile(file.path)],
+            text: 'O amintire de la nuntă!');
       }
     } catch (e) {
-      debugPrint("Eroare detaliată download: $e");
+      debugPrint("Err: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Eroare la descărcare. Verificați conexiunea.')),
+          SnackBar(content: Text('Eroare: $e')),
         );
       }
     }
