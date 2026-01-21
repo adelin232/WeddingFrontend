@@ -12,11 +12,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 
 void setupMape() {
-  // Acum funcția registerWebMap este sigură
+  // 1. Cununia Civilă (Nou)
+  registerWebMap('map-civila',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2816.634!2d26.839!3d45.148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDA4JzUyLjgiTiAyNsKwNTAnMjAuNCJF!5e0!3m2!1sro!2sro!4v123456789'); // Exemplu embed Conac
+
+  // 2. Biserica (Actualizat)
   registerWebMap('map-biserica',
-      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2712.123!2d27.612!3d47.158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDfCsDA5JzI4LjgiTiAyN8KwMzYnNDMuMiJF!5e0!3m2!1sro!2sro!4v1700000000000!5m2!1sro!2sro');
+      'https://www.google.com/maps/embed?pb=...'); // Link-ul nou de la /7
+
+  // 3. Petrecerea (Actualizat)
   registerWebMap('map-liria',
-      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2711.5!2d27.6!3d47.18!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDfCsDEwJzQ4LjAiTiAyN8KwMzYnMDAuMCJF!5e0!3m2!1sro!2sro!4v1700000000000!5m2!1sro!2sro');
+      'https://www.google.com/maps/embed?pb=...'); // Link-ul nou de la /8
 }
 
 void main() {
@@ -40,16 +46,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1A1A1A), // Negru
-          background: const Color(0xFFFDFBF7), // Crem/Hârtie
+          seedColor: const Color(0xFF1A1A1A),
+          background: const Color(0xFFFDFBF7),
         ),
-        textTheme: GoogleFonts.playfairDisplayTextTheme(),
-        scaffoldBackgroundColor: const Color(0xFFFDFBF7),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFFFDFBF7),
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.black),
+        // Playfair Display oferă acel aspect de ziar clasic, dar este mult mai clar
+        textTheme: GoogleFonts.playfairDisplayTextTheme(
+          Theme.of(context).textTheme,
+        ).copyWith(
+          bodyMedium: GoogleFonts.lora(
+              fontSize: 16), // Lora este excelent pentru citit texte lungi
         ),
       ),
       home: const NewspaperLayout(),
@@ -121,29 +126,48 @@ class LocationsSection extends StatelessWidget {
     return Column(
       children: [
         Text('LOCAȚII IMPORTANTE',
-            style: GoogleFonts.unifrakturMaguntia(
-                fontSize: 26, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 24),
+            style: GoogleFonts.playfairDisplay(
+                // Schimbat din Gotic în Playfair pentru claritate
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2)),
+        const SizedBox(height: 32),
+
+        // 1. CUNUNIA CIVILĂ
         _buildLocationTicket(
           context,
-          type: 'CEREMONIE',
-          title: 'Cununia Religioasă',
-          name: 'Biserica Sf. Ștefan',
-          address: 'Bulevardul Chimiei, Iași',
-          time: 'ORA 16:00',
-          icon: Icons.church,
-          viewId: 'map-biserica', // ID-ul înregistrat mai sus
+          type: 'CUNUNIA CIVILĂ',
+          name: 'Conacul Marghiloman',
+          address: 'Strada Plantelor, Buzău',
+          time: 'ORA 14:00',
+          icon: Icons.gavel_rounded,
+          viewId: 'map-civila',
         ),
+
         const SizedBox(height: 24),
+
+        // 2. CEREMONIA RELIGIOASĂ
         _buildLocationTicket(
           context,
-          type: 'RECEPȚIE',
-          title: 'Petrecerea',
+          type: 'CEREMONIA RELIGIOASĂ',
+          name: 'Biserica [Nume Nou]',
+          address: '[Adresă Nouă]',
+          time: 'ORA 16:30',
+          icon: Icons.church_rounded,
+          viewId: 'map-biserica',
+        ),
+
+        const SizedBox(height: 24),
+
+        // 3. RECEPȚIA
+        _buildLocationTicket(
+          context,
+          type: 'PETRECEREA',
           name: 'Liria Events',
           address: 'Lacul Aroneanu, Iași',
           time: 'ORA 20:00',
-          icon: Icons.celebration,
-          viewId: 'map-liria', // ID-ul înregistrat mai sus
+          icon: Icons.celebration_rounded,
+          viewId: 'map-liria',
         ),
       ],
     );
@@ -151,7 +175,6 @@ class LocationsSection extends StatelessWidget {
 
   Widget _buildLocationTicket(BuildContext context,
       {required String type,
-      required String title,
       required String name,
       required String address,
       required String time,
@@ -161,29 +184,27 @@ class LocationsSection extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border.all(color: Colors.black87, width: 1.5),
+        border: Border.all(color: Colors.black, width: 1),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, offset: Offset(4, 4))
+          BoxShadow(color: Colors.black12, offset: Offset(2, 2))
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header Tichet
+          // Header mic (Montserrat pentru lizibilitate)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: const BoxDecoration(
-              border:
-                  Border(bottom: BorderSide(color: Colors.black87, width: 1)),
-              color: Color(0xFFF5F5F5),
-            ),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            color: Colors.black,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(type,
-                    style: GoogleFonts.playfairDisplay(
-                        fontWeight: FontWeight.bold, letterSpacing: 2)),
-                Icon(icon, size: 18),
+                    style: GoogleFonts.montserrat(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 2)),
+                Icon(icon, color: Colors.white, size: 14),
               ],
             ),
           ),
@@ -195,51 +216,48 @@ class LocationsSection extends StatelessWidget {
                 Text(name.toUpperCase(),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5)),
+                        fontSize: 22, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 4),
                 Text(address,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
-                        fontSize: 14, fontStyle: FontStyle.italic)),
-                const SizedBox(height: 16),
+                    style: GoogleFonts.lora(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.black54)),
 
-                // HARTA EMBEDDED (Ca în Locations.tsx)
-                // În interiorul _buildLocationTicket, înlocuiește Container-ul hărții:
+                const SizedBox(height: 20),
+
+                // Zona Hărții (Embedded)
                 Container(
-                  height: 250,
+                  height: 220,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    border:
-                        Border.all(color: const Color(0xFFEEEEEE), width: 2),
-                  ),
+                      border: Border.all(color: Colors.grey.shade300)),
                   child: kIsWeb
-                      ? HtmlElementView(
-                          viewType: viewId) // Se randează doar pe browser
-                      : Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.map,
-                                  size: 40, color: Colors.grey),
-                              const SizedBox(height: 8),
-                              const Text("Harta este disponibilă în browser"),
-                              TextButton(
-                                onPressed: () => _launchMap("$name, $address"),
-                                child: const Text("DESCHIDE ÎN GOOGLE MAPS"),
-                              )
-                            ],
-                          ),
-                        ),
+                      ? HtmlElementView(viewType: viewId)
+                      : _buildMobileFallback(name, address),
                 ),
+
                 const SizedBox(height: 16),
                 Text(time,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                    style: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        letterSpacing: 1)),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMobileFallback(String name, String address) {
+    return Center(
+      child: TextButton.icon(
+        onPressed: () => _launchMap("$name, $address"),
+        icon: const Icon(Icons.directions),
+        label: const Text("VEZI HARTA"),
       ),
     );
   }
@@ -513,47 +531,37 @@ class GalleryPage extends StatelessWidget {
   // Logica de download (Web safe + Mobile)
   Future<void> _downloadImage(BuildContext context, String url) async {
     try {
-      // 1. Descarcăm imaginea
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode != 200) throw 'Eroare la descărcare';
-
-      final Uint8List bytes = response.bodyBytes;
-      final String base64data = base64Encode(bytes);
-
-      // Numele fișierului dorit
-      const String fileName = "nunta_amintire.jpg";
+      // Adăugăm un parametru în URL care uneori ajută la evitarea cache-ului
+      final String downloadUrl =
+          url.contains('?') ? '$url&download=1' : '$url?download=1';
+      final Uri uri = Uri.parse(downloadUrl);
 
       if (kIsWeb) {
-        // LOGICĂ SPECIALĂ PENTRU WEB: Folosim un element <a> cu atributul download
-        // folosind "AnchorElement" din bibliotecile web (simulat prin JavaScript)
-        final Uri dataUri =
-            Uri.parse('data:application/octet-stream;base64,$base64data');
-
-        // Aceasta este cea mai sigură metodă de a forța numele fișierului pe Web
+        // Pe Web, încercăm să forțăm descărcarea folosind un element de ancoră invizibil
+        // Acesta este cel mai bun mod de a seta numele fișierului: "nunta_amintire.jpg"
         await launchUrl(
-          dataUri,
+          uri,
           mode: LaunchMode.externalApplication,
-          // Unele browsere vor folosi downloadUrl, dar pentru nume fix:
-          webOnlyWindowName: fileName,
+          webOnlyWindowName: '_blank',
         );
       } else {
-        // LOGICĂ PENTRU MOBILE (Android/iOS):
-        // Trimitem către browserul extern cu data scheme
-        // Notă: Browserele mobile tind să ignore numele setat prin data-uri,
-        // dar "octet-stream" va declanșa dialogul de salvare.
-        final Uri dataUri =
-            Uri.parse('data:application/octet-stream;base64,$base64data');
-
-        await launchUrl(
-          dataUri,
-          mode: LaunchMode.externalApplication,
-        );
+        // Pe Android/iOS: Descheidem URL-ul direct în browserul extern.
+        // Dacă S3 are Content-Disposition setat, se va descărca automat.
+        // Dacă nu, se va deschide imaginea și utilizatorul dă "Save Image".
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
+        } else {
+          throw 'Nu s-a putut lansa URL-ul';
+        }
       }
     } catch (e) {
       debugPrint("Eroare download: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Eroare la pregătirea descărcării.')),
+          SnackBar(content: Text('Eroare: $e')),
         );
       }
     }
@@ -791,7 +799,7 @@ class NewspaperHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMetaText('IAȘI, ROMÂNIA'),
+              _buildMetaText('RÂMNICU SĂRAT, ROMÂNIA'),
               _buildMetaText('SÂMBĂTĂ, 12 SEPT, 2026'),
               _buildMetaText('13:00 PM'),
             ],
@@ -836,11 +844,13 @@ class NewspaperHeader extends StatelessWidget {
   Widget _buildMetaText(String text) {
     return Text(
       text,
-      style: GoogleFonts.playfairDisplay(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.2,
-          color: Colors.black87),
+      style: GoogleFonts.montserrat(
+        // Montserrat pentru textele tehnice mici (data, locul)
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 1.5, // Adăugăm spațiu între litere pentru claritate
+        color: Colors.black87,
+      ),
     );
   }
 }
@@ -877,9 +887,16 @@ class HeroSection extends StatelessWidget {
             ],
           ),
         ),
-        Text('SE CĂSĂTORESC!',
-            style: GoogleFonts.unifrakturMaguntia(
-                fontSize: 24, letterSpacing: 2.0)),
+        // În HeroSection
+        Text(
+          'SE CĂSĂTORESC!',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 4.0,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
         const SizedBox(height: 30),
         Transform.rotate(
           angle: -0.02,
@@ -925,7 +942,7 @@ class HeroSection extends StatelessWidget {
                     ]),
                     child: Image.network(
                       'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop',
-                      height: 300,
+                      height: 600,
                       width: double.infinity,
                       fit: BoxFit.cover,
                     ),
@@ -997,12 +1014,23 @@ class _CountdownSectionState extends State<CountdownSection> {
   Widget _buildTimeItem(int value, String label) {
     return Column(
       children: [
-        Text(value.toString().padLeft(2, '0'),
-            style: GoogleFonts.playfairDisplay(
-                fontSize: 32, fontWeight: FontWeight.bold)),
-        Text(label,
-            style: GoogleFonts.playfairDisplay(
-                fontSize: 10, letterSpacing: 1.5, color: Colors.grey[600])),
+        Text(
+          value.toString().padLeft(2, '0'),
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+            color: const Color(0xFF1A1A1A),
+          ),
+        ),
+        Text(
+          label,
+          style: GoogleFonts.montserrat(
+            fontSize: 10,
+            letterSpacing: 2,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
+        ),
       ],
     );
   }
