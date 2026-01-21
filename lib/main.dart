@@ -12,14 +12,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 
 void setupMape() {
-  // 1. Cununia Civilă
-  registerWebMap('map-civila', 'https://maps.app.goo.gl/8KPCodMTbXhiRCts5');
+  // 1. Cununia Civilă - Conacul Marghiloman
+  registerWebMap('map-civila',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2814.010851151737!2d26.841456376133117!3d45.14637657107048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b15e2cb937c839%3A0x71b4840adc1f78e7!2sConacul%20%22Marghiloman%22!5e0!3m2!1sro!2sro!4v1768991364437!5m2!1sro!2sro');
 
-  // 2. Biserica
-  registerWebMap('map-biserica', 'https://maps.app.goo.gl/8SaZ2znpHK5Un3Aw8');
+  // 2. Ceremonia Religioasă - Biserica Izvorul Tămăduirii
+  registerWebMap('map-biserica',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.498371181427!2d27.04912787614627!3d45.37911667107271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1550d9bbeacaf%3A0x4bda69add43b7b1!2sBiserica%20Izvorul%20T%C4%83m%C4%83duirii!5e0!3m2!1sro!2sro!4v1768991385158!5m2!1sro!2sro');
 
-  // 3. Petrecerea
-  registerWebMap('map-petrecere', 'https://maps.app.goo.gl/N7Eyy4JkknyadZwZ6');
+  // 3. Petrecerea - Avo GastroHan
+  registerWebMap('map-petrecere',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.720173419411!2d27.02906007614609!3d45.37464147107268!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1559d8c478857%3A0x480d1008d5447391!2sAvo%20GastroHan!5e0!3m2!1sro!2sro!4v1768991399344!5m2!1sro!2sro');
 }
 
 void main() {
@@ -220,9 +223,9 @@ class LocationsSection extends StatelessWidget {
                         color: Colors.black87)),
                 const SizedBox(height: 20),
 
-                // Hartă Embedded
+                // Zona Hărții Embedded folosind src-ul din iframe-ul tău
                 Container(
-                  height: 280,
+                  height: 300, // Înălțime mărită pentru vizibilitate mai bună
                   width: double.infinity,
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300)),
@@ -832,10 +835,10 @@ class NewspaperHeader extends StatelessWidget {
     return Text(
       text,
       style: GoogleFonts.montserrat(
-        // Montserrat pentru textele tehnice mici (data, locul)
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 1.5, // Adăugăm spațiu între litere pentru claritate
+        // Schimbat în Montserrat
+        fontSize: 10,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 1.5,
         color: Colors.black87,
       ),
     );
@@ -878,9 +881,9 @@ class HeroSection extends StatelessWidget {
         Text(
           'SE CĂSĂTORESC!',
           style: GoogleFonts.playfairDisplay(
-            fontSize: 28,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 4.0,
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 6.0, // Spațiere mare pentru eleganță
             fontStyle: FontStyle.italic,
           ),
         ),
@@ -1029,9 +1032,14 @@ class TimelineSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text('PROGRAMUL NUNȚII',
-            style: GoogleFonts.unifrakturMaguntia(
-                fontSize: 22, fontWeight: FontWeight.bold)),
+        Text(
+          'PROGRAMUL NUNȚII',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
         const SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.only(left: 10),
@@ -1101,10 +1109,23 @@ class DressCodeSection extends StatelessWidget {
         children: [
           const Icon(Icons.checkroom, size: 30),
           const SizedBox(height: 10),
-          Text('DRESS CODE',
-              style: GoogleFonts.unifrakturMaguntia(fontSize: 20)),
-          Text('Black Tie Optional',
-              style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.bold)),
+          Text(
+            'DRESS CODE',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2.0,
+            ),
+          ),
+          Text(
+            'Black Tie Optional',
+            style: GoogleFonts.montserrat(
+              // Montserrat pentru claritate maximă
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
+          ),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1133,8 +1154,66 @@ class DressCodeSection extends StatelessWidget {
   }
 }
 
-class RSVPCard extends StatelessWidget {
+class RSVPCard extends StatefulWidget {
   const RSVPCard({super.key});
+
+  @override
+  State<RSVPCard> createState() => _RSVPCardState();
+}
+
+class _RSVPCardState extends State<RSVPCard> {
+  bool? _isComing;
+  final TextEditingController _numeController = TextEditingController();
+  bool _isLoading = false;
+
+  // ÎNLOCUIEȘTE CU URL-UL TĂU COPIAT LA PASUL 1
+  final String _scriptUrl =
+      "https://script.google.com/macros/s/AICI_PUI_ID_UL_TAU/exec";
+
+  Future<void> _trimiteConfirmarea() async {
+    if (_numeController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vă rugăm să introduceți numele!')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse(_scriptUrl),
+        body: json.encode({
+          "nume": _numeController.text,
+          "prezenta": _isComing,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 302) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Confirmarea a fost salvată! Vă mulțumim!')),
+          );
+          _numeController.clear();
+          setState(() {
+            _isComing = null;
+            _isLoading = false;
+          });
+        }
+      } else {
+        throw "Eroare server";
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Eroare la trimitere: $e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -1146,44 +1225,69 @@ class RSVPCard extends StatelessWidget {
           color: Colors.grey[100],
           child: Column(
             children: [
-              Text('Confirmati Prezenta',
-                  style: GoogleFonts.unifrakturMaguntia(fontSize: 28)),
-              Text(
-                  'Vă rugăm să ne confirmați prezența până la data de 20 Iulie 2026',
-                  textAlign: TextAlign.center,
+              Text('CONFIRMAȚI PREZENȚA',
                   style: GoogleFonts.playfairDisplay(
-                      fontStyle: FontStyle.italic, color: Colors.grey[700])),
+                      fontSize: 24, fontWeight: FontWeight.w900)),
               const SizedBox(height: 20),
-              _buildInput('Nume Prenume'),
-              const SizedBox(height: 12),
-              Row(children: [
-                Radio(value: true, groupValue: true, onChanged: (v) {}),
-                Text('Vom participa', style: GoogleFonts.playfairDisplay())
-              ]),
-              Row(children: [
-                Radio(value: false, groupValue: true, onChanged: (v) {}),
-                Text('Nu putem ajunge', style: GoogleFonts.playfairDisplay())
-              ]),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.send, size: 16, color: Colors.white),
-                label: const Text('TRIMITE CONFIRMAREA'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  textStyle: GoogleFonts.playfairDisplay(
-                      letterSpacing: 1.5, fontSize: 12),
-                  // FIX CRITIC PENTRU WEB (impiedica crash):
-                  shape: const BeveledRectangleBorder(
-                      borderRadius: BorderRadius.zero),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+
+              // Câmpul pentru Nume
+              TextField(
+                controller: _numeController,
+                cursorColor: Colors.black,
+                decoration: InputDecoration(
+                  labelText: 'Nume Prenume',
+                  labelStyle: GoogleFonts.playfairDisplay(color: Colors.grey),
+                  focusedBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black)),
                 ),
-              )
+              ),
+
+              const SizedBox(height: 12),
+
+              ListTile(
+                title:
+                    Text('Vom participa', style: GoogleFonts.playfairDisplay()),
+                leading: Radio<bool>(
+                  value: true,
+                  groupValue: _isComing,
+                  activeColor: Colors.black,
+                  onChanged: (v) => setState(() => _isComing = v),
+                ),
+              ),
+              ListTile(
+                title: Text('Nu putem ajunge',
+                    style: GoogleFonts.playfairDisplay()),
+                leading: Radio<bool>(
+                  value: false,
+                  groupValue: _isComing,
+                  activeColor: Colors.black,
+                  onChanged: (v) => setState(() => _isComing = v),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              _isLoading
+                  ? const CircularProgressIndicator(color: Colors.black)
+                  : ElevatedButton.icon(
+                      onPressed: _isComing == null ? null : _trimiteConfirmarea,
+                      icon:
+                          const Icon(Icons.send, size: 16, color: Colors.white),
+                      label: const Text('TRIMITE CONFIRMAREA'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: Colors.grey[400],
+                        shape: const BeveledRectangleBorder(
+                            borderRadius: BorderRadius.zero),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 15),
+                      ),
+                    )
             ],
           ),
         ),
+        // Stampila decorativă RSVP
         Positioned(
           top: 0,
           right: 0,
@@ -1207,6 +1311,7 @@ class RSVPCard extends StatelessWidget {
 
   Widget _buildInput(String hint) {
     return TextField(
+      cursorColor: Colors.black,
       decoration: InputDecoration(
         labelText: hint,
         labelStyle: GoogleFonts.playfairDisplay(color: Colors.grey),
