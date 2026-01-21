@@ -366,8 +366,7 @@ class _UploadPageState extends State<UploadPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Redacția Foto',
-            style: GoogleFonts.unifrakturMaguntia(fontSize: 24)),
+        title: Text('Redacția Foto', style: GoogleFonts.lora(fontSize: 24)),
         centerTitle: true,
       ),
       body: Center(
@@ -561,8 +560,7 @@ class GalleryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Galeria Oficială',
-            style: GoogleFonts.unifrakturMaguntia(fontSize: 24)),
+        title: Text('Galeria Oficială', style: GoogleFonts.lora(fontSize: 24)),
         centerTitle: true,
       ),
       body: FutureBuilder<List<String>>(
@@ -718,8 +716,7 @@ class MemoriesSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Text('COLȚUL AMINTIRILOR',
-              style: GoogleFonts.unifrakturMaguntia(fontSize: 22)),
+          Text('COLȚUL AMINTIRILOR', style: GoogleFonts.lora(fontSize: 22)),
           const SizedBox(height: 8),
           Text(
             'Ajutați-ne să colectăm toate momentele frumoase!',
@@ -799,8 +796,7 @@ class NewspaperHeader extends StatelessWidget {
         Text(
           'Ziarul de Nuntă',
           textAlign: TextAlign.center,
-          style:
-              GoogleFonts.unifrakturMaguntia(fontSize: 48, color: Colors.black),
+          style: GoogleFonts.lora(fontSize: 48, color: Colors.black),
         ),
         const SizedBox(height: 10),
         Container(
@@ -1168,7 +1164,7 @@ class _RSVPCardState extends State<RSVPCard> {
 
   // ÎNLOCUIEȘTE CU URL-UL TĂU COPIAT LA PASUL 1
   final String _scriptUrl =
-      "https://script.google.com/macros/s/AICI_PUI_ID_UL_TAU/exec";
+      "https://script.google.com/macros/s/AKfycbzpj_M4EkGbip46GL1WbmRsu_wllbphbH-hfkxkyftJyTaTNBtPV3WNJDvUyzPnUE6B/exec";
 
   Future<void> _trimiteConfirmarea() async {
     if (_numeController.text.isEmpty) {
