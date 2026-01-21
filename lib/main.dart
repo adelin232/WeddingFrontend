@@ -528,41 +528,53 @@ class GalleryPage extends StatelessWidget {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Se procesează imaginea...'),
+            content: Text('Se încearcă descărcarea...'),
             duration: Duration(seconds: 1)),
       );
 
-      // 1. Descarcă imaginea de pe net (comun pt ambele)
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode != 200) throw 'Eroare server';
+      // Truc: Adăugăm un parametru de timp pentru a forța browserul să nu folosească o versiune veche (fără drepturi) din cache
+      final String cacheBusterUrl = url.contains('?')
+          ? '$url&t=${DateTime.now().millisecondsSinceEpoch}'
+          : '$url?t=${DateTime.now().millisecondsSinceEpoch}';
 
-      final Uint8List bytes = response.bodyBytes;
-      final String fileName =
-          "amintire_nunta_${DateTime.now().millisecondsSinceEpoch}.jpg";
+      // Încercăm să descărcăm datele pentru a le redenumi
+      final response = await http.get(Uri.parse(cacheBusterUrl));
 
-      if (kIsWeb) {
-        // LOGICA WEB (Nume corect + Download automat)
-        downloadWeb(bytes, fileName); // Apelează funcția din helper
+      if (response.statusCode == 200) {
+        // SUCCES: Putem pune numele dorit
+        final Uint8List bytes = response.bodyBytes;
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final String fileName = "nunta_andreea_adelin_$timestamp.jpg";
+
+        if (kIsWeb) {
+          downloadWeb(bytes, fileName);
+        } else {
+          // Logica pentru aplicație nativă (dacă vei face APK vreodată)
+          final tempDir = await getTemporaryDirectory();
+          final file = File('${tempDir.path}/$fileName');
+          await file.writeAsBytes(bytes);
+          await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
+        }
       } else {
-        // LOGICA MOBIL (Fără crash-uri)
-        // 1. Găsim folderul temporar al telefonului
-        final tempDir = await getTemporaryDirectory();
-        final file = File('${tempDir.path}/$fileName');
-
-        // 2. Scriem imaginea pe disc
-        await file.writeAsBytes(bytes);
-
-        // 3. Deschidem meniul de Share/Save
-        // Utilizatorul va alege "Save Image" sau "Save to Files"
-        await Share.shareXFiles([XFile(file.path)],
-            text: 'O amintire de la nuntă!');
+        throw 'Serverul a refuzat conexiunea.';
       }
     } catch (e) {
-      debugPrint("Err: $e");
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Eroare: $e')),
+      debugPrint("Eroare download inteligent ($e). Se trece la Planul B.");
+
+      // PLAN B: Dacă http.get eșuează (CORS), deschidem link-ul direct.
+      // Utilizatorul va vedea poza și o poate salva cu "Long Press" -> "Save Image"
+      try {
+        await launchUrl(
+          Uri.parse(url),
+          mode: LaunchMode
+              .externalApplication, // Deschide în tab nou / aplicație externă
         );
+      } catch (e2) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Nu s-a putut deschide imaginea.')),
+          );
+        }
       }
     }
   }
