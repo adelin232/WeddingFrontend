@@ -12,17 +12,14 @@ import 'package:url_launcher/url_launcher.dart';
 import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 
 void setupMape() {
-  // 1. Cununia Civilă (Nou)
-  registerWebMap('map-civila',
-      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2816.634!2d26.839!3d45.148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDXCsDA4JzUyLjgiTiAyNsKwNTAnMjAuNCJF!5e0!3m2!1sro!2sro!4v123456789'); // Exemplu embed Conac
+  // 1. Cununia Civilă
+  registerWebMap('map-civila', 'https://maps.app.goo.gl/8KPCodMTbXhiRCts5');
 
-  // 2. Biserica (Actualizat)
-  registerWebMap('map-biserica',
-      'https://www.google.com/maps/embed?pb=...'); // Link-ul nou de la /7
+  // 2. Biserica
+  registerWebMap('map-biserica', 'https://maps.app.goo.gl/8SaZ2znpHK5Un3Aw8');
 
-  // 3. Petrecerea (Actualizat)
-  registerWebMap('map-liria',
-      'https://www.google.com/maps/embed?pb=...'); // Link-ul nou de la /8
+  // 3. Petrecerea
+  registerWebMap('map-petrecere', 'https://maps.app.goo.gl/N7Eyy4JkknyadZwZ6');
 }
 
 void main() {
@@ -127,47 +124,44 @@ class LocationsSection extends StatelessWidget {
       children: [
         Text('LOCAȚII IMPORTANTE',
             style: GoogleFonts.playfairDisplay(
-                // Schimbat din Gotic în Playfair pentru claritate
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2)),
-        const SizedBox(height: 32),
+                fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        const SizedBox(height: 40),
 
         // 1. CUNUNIA CIVILĂ
         _buildLocationTicket(
           context,
           type: 'CUNUNIA CIVILĂ',
           name: 'Conacul Marghiloman',
-          address: 'Strada Plantelor, Buzău',
+          address: 'Strada Plantelor 8, Buzău, Romania',
           time: 'ORA 14:00',
           icon: Icons.gavel_rounded,
           viewId: 'map-civila',
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 30),
 
         // 2. CEREMONIA RELIGIOASĂ
         _buildLocationTicket(
           context,
           type: 'CEREMONIA RELIGIOASĂ',
-          name: 'Biserica [Nume Nou]',
-          address: '[Adresă Nouă]',
+          name: 'Biserica Izvorul Tămăduirii',
+          address: 'Strada Nicolae Bălcescu, Râmnicu Sărat 125300',
           time: 'ORA 16:30',
           icon: Icons.church_rounded,
           viewId: 'map-biserica',
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 30),
 
-        // 3. RECEPȚIA
+        // 3. PETRECEREA
         _buildLocationTicket(
           context,
           type: 'PETRECEREA',
-          name: 'Liria Events',
-          address: 'Lacul Aroneanu, Iași',
+          name: 'Avo GastroHan',
+          address: 'Strada Stadionului 10, Râmnicu Sărat 125300',
           time: 'ORA 20:00',
           icon: Icons.celebration_rounded,
-          viewId: 'map-liria',
+          viewId: 'map-petrecere',
         ),
       ],
     );
@@ -186,14 +180,13 @@ class LocationsSection extends StatelessWidget {
         color: Colors.white,
         border: Border.all(color: Colors.black, width: 1),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, offset: Offset(2, 2))
+          BoxShadow(color: Colors.black12, offset: Offset(4, 4))
         ],
       ),
       child: Column(
         children: [
-          // Header mic (Montserrat pentru lizibilitate)
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
             color: Colors.black,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -201,63 +194,57 @@ class LocationsSection extends StatelessWidget {
                 Text(type,
                     style: GoogleFonts.montserrat(
                         color: Colors.white,
-                        fontSize: 10,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 2)),
-                Icon(icon, color: Colors.white, size: 14),
+                Icon(icon, color: Colors.white, size: 16),
               ],
             ),
           ),
-
           Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             child: Column(
               children: [
                 Text(name.toUpperCase(),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
-                        fontSize: 22, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 4),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.black)),
+                const SizedBox(height: 6),
                 Text(address,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
-                        fontSize: 14,
+                        fontSize: 15,
                         fontStyle: FontStyle.italic,
-                        color: Colors.black54)),
-
+                        color: Colors.black87)),
                 const SizedBox(height: 20),
 
-                // Zona Hărții (Embedded)
+                // Hartă Embedded
                 Container(
-                  height: 220,
+                  height: 280,
                   width: double.infinity,
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade300)),
                   child: kIsWeb
                       ? HtmlElementView(viewType: viewId)
-                      : _buildMobileFallback(name, address),
+                      : Center(
+                          child: TextButton.icon(
+                              onPressed: () => _launchMap("$name, $address"),
+                              icon: const Icon(Icons.map),
+                              label: const Text("DESCHIDE HARTA"))),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Text(time,
                     style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 18,
                         letterSpacing: 1)),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMobileFallback(String name, String address) {
-    return Center(
-      child: TextButton.icon(
-        onPressed: () => _launchMap("$name, $address"),
-        icon: const Icon(Icons.directions),
-        label: const Text("VEZI HARTA"),
       ),
     );
   }
