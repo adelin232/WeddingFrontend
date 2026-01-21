@@ -9,8 +9,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
+
+void setupMape() {
+  // Acum funcția registerWebMap este sigură
+  registerWebMap('map-biserica',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2712.123!2d27.612!3d47.158!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDfCsDA5JzI4LjgiTiAyN8KwMzYnNDMuMiJF!5e0!3m2!1sro!2sro!4v1700000000000!5m2!1sro!2sro');
+  registerWebMap('map-liria',
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2711.5!2d27.6!3d47.18!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDfCsDEwJzQ4LjAiTiAyN8KwMzYnMDAuMCJF!5e0!3m2!1sro!2sro!4v1700000000000!5m2!1sro!2sro');
+}
 
 void main() {
+  if (kIsWeb) {
+    setupMape();
+  }
   runApp(const MyApp());
 }
 
@@ -112,8 +124,6 @@ class LocationsSection extends StatelessWidget {
             style: GoogleFonts.unifrakturMaguntia(
                 fontSize: 26, fontWeight: FontWeight.bold)),
         const SizedBox(height: 24),
-
-        // Locația 1
         _buildLocationTicket(
           context,
           type: 'CEREMONIE',
@@ -122,11 +132,9 @@ class LocationsSection extends StatelessWidget {
           address: 'Bulevardul Chimiei, Iași',
           time: 'ORA 16:00',
           icon: Icons.church,
+          viewId: 'map-biserica', // ID-ul înregistrat mai sus
         ),
-
         const SizedBox(height: 24),
-
-        // Locația 2
         _buildLocationTicket(
           context,
           type: 'RECEPȚIE',
@@ -135,6 +143,7 @@ class LocationsSection extends StatelessWidget {
           address: 'Lacul Aroneanu, Iași',
           time: 'ORA 20:00',
           icon: Icons.celebration,
+          viewId: 'map-liria', // ID-ul înregistrat mai sus
         ),
       ],
     );
@@ -146,18 +155,15 @@ class LocationsSection extends StatelessWidget {
       required String name,
       required String address,
       required String time,
-      required IconData icon}) {
+      required IconData icon,
+      required String viewId}) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Colors.black87, width: 1.5),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            offset: Offset(4, 4),
-            blurRadius: 0,
-          )
+          BoxShadow(color: Colors.black12, offset: Offset(4, 4))
         ],
       ),
       child: Column(
@@ -182,7 +188,6 @@ class LocationsSection extends StatelessWidget {
             ),
           ),
 
-          // Body Tichet
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -193,40 +198,44 @@ class LocationsSection extends StatelessWidget {
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.5)),
-                const SizedBox(height: 8),
                 Text(address,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey[800])),
+                        fontSize: 14, fontStyle: FontStyle.italic)),
                 const SizedBox(height: 16),
-                const Divider(color: Colors.black26, indent: 40, endIndent: 40),
+
+                // HARTA EMBEDDED (Ca în Locations.tsx)
+                // În interiorul _buildLocationTicket, înlocuiește Container-ul hărții:
+                Container(
+                  height: 250,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border:
+                        Border.all(color: const Color(0xFFEEEEEE), width: 2),
+                  ),
+                  child: kIsWeb
+                      ? HtmlElementView(
+                          viewType: viewId) // Se randează doar pe browser
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.map,
+                                  size: 40, color: Colors.grey),
+                              const SizedBox(height: 8),
+                              const Text("Harta este disponibilă în browser"),
+                              TextButton(
+                                onPressed: () => _launchMap("$name, $address"),
+                                child: const Text("DESCHIDE ÎN GOOGLE MAPS"),
+                              )
+                            ],
+                          ),
+                        ),
+                ),
                 const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black)),
-                      child: Text(time,
-                          style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                    const SizedBox(width: 16),
-                    TextButton.icon(
-                      onPressed: () => _launchMap("$name, $address"),
-                      icon: const Icon(Icons.directions,
-                          size: 18, color: Colors.black),
-                      label: const Text('NAVIGHEAZĂ',
-                          style: TextStyle(
-                              color: Colors.black,
-                              decoration: TextDecoration.underline,
-                              fontWeight: FontWeight.bold)),
-                    )
-                  ],
-                )
+                Text(time,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ),
           ),
