@@ -502,26 +502,30 @@ class GalleryPage extends StatelessWidget {
   }
 
   // Logica de download (Web safe + Mobile)
-  // Modifică doar metoda _downloadImage din GalleryPage:
+  // Înlocuiește complet metoda _downloadImage din GalleryPage cu aceasta:
   Future<void> _downloadImage(BuildContext context, String url) async {
-    final Uri uri = Uri.parse(url);
-
     try {
-      // Folosim launchUrl pentru TOATE platformele ca metodă de fallback sigură
-      // Pe Android/iOS va deschide browserul care gestionează singur permisiunile de download
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        throw 'Nu s-a putut lansa URL-ul';
-      }
+      // 1. Descarcăm imaginea ca bytes indiferent de platformă
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode != 200) throw 'Eroare la descărcare';
+
+      // 2. Convertim în Base64
+      final content = base64Encode(response.bodyBytes);
+
+      // 3. Creăm URL-ul de tip data scheme (octet-stream forțează descărcarea)
+      final downloadUrl = 'data:application/octet-stream;base64,$content';
+
+      // 4. Lansăm URL-ul în browserul extern
+      // Pe Android, browserul va recunoaște header-ul de stream și va porni download-ul
+      await launchUrl(
+        Uri.parse(downloadUrl),
+        mode: LaunchMode.externalApplication,
+      );
     } catch (e) {
       debugPrint("Eroare download: $e");
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Eroare la deschidere: $e')),
+          const SnackBar(content: Text('Eroare la procesarea imaginii.')),
         );
       }
     }
