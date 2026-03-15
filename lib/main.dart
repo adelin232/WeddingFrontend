@@ -1218,20 +1218,29 @@ class RSVPCard extends StatefulWidget {
 
 class _RSVPCardState extends State<RSVPCard> {
   bool? _isComing;
-  bool _isVegetarian = false;
+  int _nrMeniuClasic = 0;
+  int _nrMeniuVegetarian = 0;
   final TextEditingController _numeController = TextEditingController();
-  final TextEditingController _nrPersoaneController =
-      TextEditingController(text: "1"); // Default 1
   bool _isLoading = false;
 
+  // URL-ul tau de la Google Apps Script
   final String _scriptUrl =
-      "https://script.google.com/macros/s/AKfycbzMbxoSLEN1_wt8rrRPb7N_3rWDxSyBM0q-HcQdMD5FazBySFrspFCan1l38zZcS6gs/exec";
+      "https://script.google.com/macros/s/AKfycbzDf9Hem_sn5ghWNiYRVfdfnHErS9ibub_qwAQ7LEWr3dbWY9eENbtI-A8ywQQDuIiv/exec";
+
+  void _showSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: GoogleFonts.lora()),
+        backgroundColor: Colors.black,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   Future<void> _trimiteConfirmarea() async {
     if (_numeController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vă rugăm să introduceți numele!')),
-      );
+      _showSnackBar('Vă rugăm să introduceți numele!');
       return;
     }
 
@@ -1241,43 +1250,39 @@ class _RSVPCardState extends State<RSVPCard> {
       final response = await http.post(
         Uri.parse(_scriptUrl),
         body: json.encode({
-          "nume": _numeController.text,
+          "nume": _numeController.text.trim(),
           "prezenta": _isComing,
-          "nrPersoane": _isComing == true
-              ? int.tryParse(_nrPersoaneController.text) ?? 1
-              : 0,
-          "vegetarian": _isComing == true ? _isVegetarian : false,
+          "meniuClasic": _isComing == true ? _nrMeniuClasic : 0,
+          "meniuVegetarian": _isComing == true ? _nrMeniuVegetarian : 0,
+          "totalPersoane":
+              _isComing == true ? (_nrMeniuClasic + _nrMeniuVegetarian) : 0,
         }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 302) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Confirmarea a fost salvată! Vă mulțumim!')),
-          );
-          _numeController.clear();
-          setState(() {
-            _isComing = null;
-            _isVegetarian = false;
-            _isLoading = false;
-          });
-        }
+        _showSnackBar('Confirmarea a fost salvată! Vă mulțumim!');
+        _numeController.clear();
+        setState(() {
+          _isComing = null;
+          _nrMeniuClasic = 0;
+          _nrMeniuVegetarian = 0;
+          _isLoading = false;
+        });
       } else {
-        throw "Eroare server";
+        throw "Eroare server (${response.statusCode})";
       }
     } catch (e) {
       setState(() => _isLoading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Eroare la trimitere: $e')),
-        );
-      }
+      _showSnackBar('Eroare la trimitere: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Validare: Butonul e activ daca (au zis NU) SAU (au zis DA si au minim 1 meniu selectat)
+    bool isFormValid = _isComing == false ||
+        (_isComing == true && (_nrMeniuClasic + _nrMeniuVegetarian) > 0);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1288,7 +1293,7 @@ class _RSVPCardState extends State<RSVPCard> {
       ),
       child: Column(
         children: [
-          // Header Formular
+          // Header Negru RSVP
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -1323,16 +1328,15 @@ class _RSVPCardState extends State<RSVPCard> {
                 ),
                 const SizedBox(height: 30),
 
-                // Câmp Nume
+                // INPUT NUME
                 TextField(
                   controller: _numeController,
                   cursorColor: Colors.black,
-                  style: GoogleFonts.lora(),
                   decoration: InputDecoration(
                     labelText: 'Cine ne onorează cu prezența?',
-                    hintText: 'Ex: Familia Ionescu / Bianca și Bogdan',
-                    labelStyle:
-                        GoogleFonts.playfairDisplay(color: Colors.black87),
+                    hintText: 'Ex: Familia Popescu / Maria și Ion',
+                    labelStyle: GoogleFonts.playfairDisplay(
+                        color: Colors.black, fontWeight: FontWeight.bold),
                     floatingLabelBehavior: FloatingLabelBehavior.always,
                     enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black26)),
@@ -1344,103 +1348,54 @@ class _RSVPCardState extends State<RSVPCard> {
 
                 const SizedBox(height: 24),
 
-                // Întrebarea Participare
+                // INTREBARE PARTICIPARE
                 Text('Veți fi alături de noi?',
                     style: GoogleFonts.playfairDisplay(
                         fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 8),
-                _buildRadioOption(
-                  title: 'Da, abia așteptăm!',
-                  value: true,
-                  groupValue: _isComing,
-                  onChanged: (v) => setState(() => _isComing = v),
-                ),
-                _buildRadioOption(
-                  title: 'Din păcate, nu putem ajunge',
-                  value: false,
-                  groupValue: _isComing,
-                  onChanged: (v) => setState(() => _isComing = v),
-                ),
+                const SizedBox(height: 12),
 
-                // SECȚIUNE CONDIȚIONATĂ: DATE SUPLIMENTARE
+                _buildRadioOption('Da, abia așteptăm!', true),
+                _buildRadioOption('Din păcate, nu putem ajunge', false),
+
+                // SECTIUNE MENIURI (Apare doar daca _isComing == true)
                 if (_isComing == true) ...[
                   const SizedBox(height: 24),
                   const Divider(),
                   const SizedBox(height: 16),
-
-                  // Rând pentru Număr Persoane și Meniu Vegetarian
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // INPUT NUMBER: NR PERSOANE
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Nr. persoane',
-                                style: GoogleFonts.playfairDisplay(
-                                    fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            TextField(
-                              controller: _nrPersoaneController,
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              decoration: const InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 10),
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.black26)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.black)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-
-                      // MENIU VEGETARIAN
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Meniu vegetarian?',
-                                style: GoogleFonts.playfairDisplay(
-                                    fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                _buildSimpleChip('DA', _isVegetarian == true,
-                                    () => setState(() => _isVegetarian = true)),
-                                const SizedBox(width: 8),
-                                _buildSimpleChip(
-                                    'NU',
-                                    _isVegetarian == false,
-                                    () =>
-                                        setState(() => _isVegetarian = false)),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  Text('CONFIGURARE MENIURI',
+                      style: GoogleFonts.playfairDisplay(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          letterSpacing: 1)),
+                  const SizedBox(height: 20),
+                  _buildMenuRow("Meniu Clasic", _nrMeniuClasic, (val) {
+                    setState(() => _nrMeniuClasic = val!);
+                  }),
+                  const SizedBox(height: 12),
+                  _buildMenuRow("Meniu Vegetarian", _nrMeniuVegetarian, (val) {
+                    setState(() => _nrMeniuVegetarian = val!);
+                  }),
+                  if (_nrMeniuClasic + _nrMeniuVegetarian == 0)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12),
+                      child: Text('* Selectați cel puțin un meniu',
+                          style: GoogleFonts.lora(
+                              color: Colors.red[700], fontSize: 12)),
+                    ),
                 ],
 
                 const SizedBox(height: 40),
 
+                // BUTON TRIMITE
                 _isLoading
                     ? const CircularProgressIndicator(color: Colors.black)
                     : SizedBox(
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed:
-                              _isComing == null ? null : _trimiteConfirmarea,
+                          onPressed: (_isComing == null || !isFormValid)
+                              ? null
+                              : _trimiteConfirmarea,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
@@ -1463,20 +1418,17 @@ class _RSVPCardState extends State<RSVPCard> {
     );
   }
 
-  Widget _buildRadioOption(
-      {required String title,
-      required bool value,
-      required bool? groupValue,
-      required Function(bool?) onChanged}) {
+  // Widget pentru optiunile Radio
+  Widget _buildRadioOption(String title, bool value) {
     return InkWell(
-      onTap: () => onChanged(value),
+      onTap: () => setState(() => _isComing = value),
       child: Row(
         children: [
           Radio<bool>(
             value: value,
-            groupValue: groupValue,
+            groupValue: _isComing,
             activeColor: Colors.black,
-            onChanged: onChanged,
+            onChanged: (v) => setState(() => _isComing = v),
           ),
           Text(title, style: GoogleFonts.lora(fontSize: 15)),
         ],
@@ -1484,24 +1436,32 @@ class _RSVPCardState extends State<RSVPCard> {
     );
   }
 
-  Widget _buildSimpleChip(String label, bool isSelected, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? Colors.black : Colors.transparent,
-          border: Border.all(color: Colors.black),
-        ),
-        child: Text(
-          label,
-          style: GoogleFonts.montserrat(
-            color: isSelected ? Colors.white : Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
+  // Widget pentru randurile de meniu cu Dropdown
+  Widget _buildMenuRow(
+      String label, int currentValue, Function(int?) onChanged) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: GoogleFonts.lora(fontSize: 16)),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black26),
+          ),
+          child: DropdownButton<int>(
+            value: currentValue,
+            underline: const SizedBox(),
+            items: List.generate(11, (index) => index)
+                .map((i) => DropdownMenuItem<int>(
+                      value: i,
+                      child:
+                          Text(i.toString(), style: GoogleFonts.montserrat()),
+                    ))
+                .toList(),
+            onChanged: onChanged,
           ),
         ),
-      ),
+      ],
     );
   }
 }
