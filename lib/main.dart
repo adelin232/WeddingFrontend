@@ -18,15 +18,11 @@ import 'stub_download_helper.dart'
     if (dart.library.html) 'web_download_helper.dart';
 
 void setupMape() {
-  // 1. Cununia Civilă - Conacul Marghiloman
-  registerWebMap('map-civila',
-      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2814.010851151737!2d26.841456376133117!3d45.14637657107048!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b15e2cb937c839%3A0x71b4840adc1f78e7!2sConacul%20%22Marghiloman%22!5e0!3m2!1sro!2sro!4v1768991364437!5m2!1sro!2sro');
-
-  // 2. Ceremonia Religioasă - Biserica Izvorul Tămăduirii
+  // 1. Ceremonia Religioasă - Biserica Cuvioasa Parascheva
   registerWebMap('map-biserica',
-      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.498371181427!2d27.04912787614627!3d45.37911667107271!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1550d9bbeacaf%3A0x4bda69add43b7b1!2sBiserica%20Izvorul%20T%C4%83m%C4%83duirii!5e0!3m2!1sro!2sro!4v1768991385158!5m2!1sro!2sro');
+      'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.266091664396!2d27.035552386773457!3d45.38380289648595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1556e31b7bfb3%3A0x8775a6c3cc9a9399!2sBiserica%20Cuvioasa%20Parascheva!5e0!3m2!1sro!2sro!4v1773585186168!5m2!1sro!2sro');
 
-  // 3. Petrecerea - Avo GastroHan
+  // 2. Petrecerea - Avo GastroHan
   registerWebMap('map-petrecere',
       'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.720173419411!2d27.02906007614609!3d45.37464147107268!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1559d8c478857%3A0x480d1008d5447391!2sAvo%20GastroHan!5e0!3m2!1sro!2sro!4v1768991399344!5m2!1sro!2sro');
 }
@@ -76,36 +72,48 @@ class NewspaperLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              NewspaperHeader(),
-              SizedBox(height: 30),
-              HeroSection(),
-              SectionDivider(),
-              CountdownSection(targetDateStr: "2026-09-12 14:00:00"),
-
-              SizedBox(height: 30),
-              // --- SECȚIUNEA INTERACTIVĂ (Upload & Galerie) ---
-              MemoriesSection(),
-
-              SectionDivider(),
-              // --- SECȚIUNEA LOCAȚII (Refăcută) ---
-              LocationsSection(),
-              SectionDivider(),
-
-              TimelineSection(),
-              SizedBox(height: 30),
-              DressCodeSection(),
-              SizedBox(height: 40),
-              RSVPCard(),
-              SizedBox(height: 60),
-              NewspaperFooter(),
-            ],
+        child: Center(
+          // Centram pe orizontala
+          child: Container(
+            constraints:
+                const BoxConstraints(maxWidth: 800), // Latime optima de citit
+            decoration: BoxDecoration(
+              color: const Color(0xFFFDFBF7),
+              boxShadow: kIsWeb
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      )
+                    ]
+                  : [],
+            ),
+            child: const SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  NewspaperHeader(),
+                  SizedBox(height: 30),
+                  HeroSection(),
+                  SectionDivider(),
+                  CountdownSection(targetDateStr: "2026-09-12 14:00:00"),
+                  SizedBox(height: 30),
+                  MemoriesSection(),
+                  SectionDivider(),
+                  LocationsSection(),
+                  SectionDivider(),
+                  TimelineSection(), // Sectiunea noua alternativa
+                  SizedBox(height: 40),
+                  RSVPCard(),
+                  SizedBox(height: 60),
+                  NewspaperFooter(),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -136,39 +144,26 @@ class LocationsSection extends StatelessWidget {
                 fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
         const SizedBox(height: 40),
 
-        // 1. CUNUNIA CIVILĂ
-        _buildLocationTicket(
-          context,
-          type: 'CUNUNIA CIVILĂ',
-          name: 'Conacul Marghiloman',
-          address: 'Strada Plantelor 8, Buzău, Romania',
-          time: 'ORA 14:00',
-          icon: Icons.gavel_rounded,
-          viewId: 'map-civila',
-        ),
-
-        const SizedBox(height: 30),
-
-        // 2. CEREMONIA RELIGIOASĂ
+        // 1. CEREMONIA RELIGIOASĂ
         _buildLocationTicket(
           context,
           type: 'CEREMONIA RELIGIOASĂ',
-          name: 'Biserica Izvorul Tămăduirii',
-          address: 'Strada Nicolae Bălcescu, Râmnicu Sărat 125300',
-          time: 'ORA 16:30',
+          name: 'Biserica Cuvioasa Parascheva',
+          address: 'Strada Patriei, Râmnicu Sărat',
+          time: 'ORA 17:00',
           icon: Icons.church_rounded,
           viewId: 'map-biserica',
         ),
 
         const SizedBox(height: 30),
 
-        // 3. PETRECEREA
+        // 2. PETRECEREA
         _buildLocationTicket(
           context,
           type: 'PETRECEREA',
           name: 'Avo GastroHan',
-          address: 'Strada Stadionului 10, Râmnicu Sărat 125300',
-          time: 'ORA 20:00',
+          address: 'Strada Stadionului 10, Râmnicu Sărat',
+          time: 'ORA 18:30',
           icon: Icons.celebration_rounded,
           viewId: 'map-petrecere',
         ),
@@ -811,7 +806,6 @@ class NewspaperHeader extends StatelessWidget {
             children: [
               _buildMetaText('RÂMNICU SĂRAT, ROMÂNIA'),
               _buildMetaText('SÂMBĂTĂ, 12 SEPT, 2026'),
-              _buildMetaText('13:00 PM'),
             ],
           ),
         ),
@@ -868,6 +862,8 @@ class HeroSection extends StatelessWidget {
   const HeroSection({super.key});
   @override
   Widget build(BuildContext context) {
+    const photoUrl = String.fromEnvironment('PHOTO_URL',
+        defaultValue: 'https://YOUR_PHOTO_URL/photo');
     return Column(
       children: [
         Text('CEA MAI FRUMOASĂ ZI DIN VIAȚA LOR',
@@ -950,15 +946,15 @@ class HeroSection extends StatelessWidget {
                       0,
                     ]),
                     child: Image.network(
-                      'https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop',
-                      height: 600,
-                      width: double.infinity,
+                      photoUrl,
+                      height: 800,
+                      width: 600,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text('Fotografie de logodnă, 2025',
+                Text('Balul de 8 martie 2026',
                     style: GoogleFonts.playfairDisplay(
                         fontSize: 10,
                         fontStyle: FontStyle.italic,
@@ -1047,68 +1043,108 @@ class _CountdownSectionState extends State<CountdownSection> {
 
 class TimelineSection extends StatelessWidget {
   const TimelineSection({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, String>> events = [
+      {
+        'time': '17:00',
+        'title': 'Cununia Religioasă',
+        'loc': 'Biserica Cuv. Parascheva'
+      },
+      {'time': '18:30', 'title': 'Petrecerea', 'loc': 'Avo GastroHan'},
+      {'time': '20:30', 'title': 'Dansul Mirilor', 'loc': 'Ringul de Dans'},
+      {'time': '01:00', 'title': 'Tortul Mirilor', 'loc': 'Sala Principală'},
+    ];
+
     return Column(
       children: [
         Text(
           'PROGRAMUL NUNȚII',
           style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
+            fontSize: 26,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.5,
           ),
         ),
-        const SizedBox(height: 20),
-        Container(
-          padding: const EdgeInsets.only(left: 10),
-          decoration: const BoxDecoration(
-              border: Border(left: BorderSide(color: Colors.grey, width: 1))),
-          child: Column(
-            children: [
-              _buildEvent(
-                  '13:00', 'Cununia Civilă', 'Liria Events', Icons.restaurant),
-              _buildEvent(
-                  '14:00', 'Cocktail Hour', 'Grădina de Vară', Icons.local_bar),
-              _buildEvent('16:00', 'Cununia Religioasă', 'Bis. Sf. Ștefan',
-                  Icons.church),
-              _buildEvent(
-                  '20:00', 'Petrecerea', 'Liria Events', Icons.music_note),
-              _buildEvent('21:30', 'Dansul Mirilor', 'Ringul de Dans',
-                  Icons.nightlight_round),
-              _buildEvent('01:00', 'Tortul Mirilor', 'Terasă', Icons.cake),
-            ],
-          ),
-        )
+        const SizedBox(height: 40),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: events.length,
+          itemBuilder: (context, index) {
+            bool isLeft = index % 2 == 0;
+            return IntrinsicHeight(
+              child: Row(
+                children: [
+                  // Partea stângă
+                  Expanded(
+                    child: isLeft
+                        ? _buildEventDetail(
+                            events[index], CrossAxisAlignment.end,
+                            textAlign: TextAlign.right)
+                        : const SizedBox(),
+                  ),
+                  // Linia centrală cu punct
+                  Column(
+                    children: [
+                      Container(width: 1, color: Colors.black38, height: 20),
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black),
+                          color: const Color(0xFFFDFBF7),
+                        ),
+                        child: const CircleAvatar(
+                            radius: 3, backgroundColor: Colors.black),
+                      ),
+                      Expanded(
+                          child: Container(width: 1, color: Colors.black38)),
+                    ],
+                  ),
+                  // Partea dreaptă
+                  Expanded(
+                    child: !isLeft
+                        ? _buildEventDetail(
+                            events[index], CrossAxisAlignment.start,
+                            textAlign: TextAlign.left)
+                        : const SizedBox(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildEvent(String time, String title, String loc, IconData icon) {
+  Widget _buildEventDetail(
+      Map<String, String> event, CrossAxisAlignment alignment,
+      {required TextAlign textAlign}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24, left: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        crossAxisAlignment: alignment,
         children: [
-          Icon(icon, size: 20, color: Colors.black54),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(time,
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              Text(title,
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5)),
-              Text(loc,
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      color: Colors.grey[600])),
-            ],
+          Text(
+            event['time']!,
+            style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.w900, fontSize: 14, letterSpacing: 1),
+          ),
+          Text(
+            event['title']!,
+            textAlign: textAlign,
+            style: GoogleFonts.playfairDisplay(
+                fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          Text(
+            event['loc']!,
+            style: GoogleFonts.lora(
+                fontStyle: FontStyle.italic,
+                fontSize: 13,
+                color: Colors.black54),
           ),
         ],
       ),
@@ -1182,15 +1218,17 @@ class RSVPCard extends StatefulWidget {
 
 class _RSVPCardState extends State<RSVPCard> {
   bool? _isComing;
+  bool _isVegetarian = false;
   final TextEditingController _numeController = TextEditingController();
+  final TextEditingController _nrPersoaneController =
+      TextEditingController(text: "1"); // Default 1
   bool _isLoading = false;
 
-  // ÎNLOCUIEȘTE CU URL-UL TĂU COPIAT LA PASUL 1
   final String _scriptUrl =
-      "https://script.google.com/macros/s/AKfycbzpj_M4EkGbip46GL1WbmRsu_wllbphbH-hfkxkyftJyTaTNBtPV3WNJDvUyzPnUE6B/exec";
+      "https://script.google.com/macros/s/AKfycbzMbxoSLEN1_wt8rrRPb7N_3rWDxSyBM0q-HcQdMD5FazBySFrspFCan1l38zZcS6gs/exec";
 
   Future<void> _trimiteConfirmarea() async {
-    if (_numeController.text.isEmpty) {
+    if (_numeController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vă rugăm să introduceți numele!')),
       );
@@ -1205,6 +1243,10 @@ class _RSVPCardState extends State<RSVPCard> {
         body: json.encode({
           "nume": _numeController.text,
           "prezenta": _isComing,
+          "nrPersoane": _isComing == true
+              ? int.tryParse(_nrPersoaneController.text) ?? 1
+              : 0,
+          "vegetarian": _isComing == true ? _isVegetarian : false,
         }),
       );
 
@@ -1217,6 +1259,7 @@ class _RSVPCardState extends State<RSVPCard> {
           _numeController.clear();
           setState(() {
             _isComing = null;
+            _isVegetarian = false;
             _isLoading = false;
           });
         }
@@ -1235,96 +1278,230 @@ class _RSVPCardState extends State<RSVPCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        Container(
-          margin: const EdgeInsets.only(top: 10, right: 10),
-          padding: const EdgeInsets.all(24),
-          color: Colors.grey[100],
-          child: Column(
-            children: [
-              Text('CONFIRMAȚI PREZENȚA',
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: 24, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 20),
-
-              // Câmpul pentru Nume
-              TextField(
-                controller: _numeController,
-                cursorColor: Colors.black,
-                decoration: InputDecoration(
-                  labelText: 'Nume Prenume',
-                  labelStyle: GoogleFonts.playfairDisplay(color: Colors.grey),
-                  focusedBorder: const UnderlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
-                ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black, width: 1),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, offset: Offset(4, 4))
+        ],
+      ),
+      child: Column(
+        children: [
+          // Header Formular
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            color: Colors.black,
+            child: Text(
+              'RSVP',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 4,
+                fontSize: 14,
               ),
-
-              const SizedBox(height: 12),
-
-              ListTile(
-                title:
-                    Text('Vom participa', style: GoogleFonts.playfairDisplay()),
-                leading: Radio<bool>(
-                  value: true,
-                  groupValue: _isComing,
-                  activeColor: Colors.black,
-                  onChanged: (v) => setState(() => _isComing = v),
-                ),
-              ),
-              ListTile(
-                title: Text('Nu putem ajunge',
-                    style: GoogleFonts.playfairDisplay()),
-                leading: Radio<bool>(
-                  value: false,
-                  groupValue: _isComing,
-                  activeColor: Colors.black,
-                  onChanged: (v) => setState(() => _isComing = v),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              _isLoading
-                  ? const CircularProgressIndicator(color: Colors.black)
-                  : ElevatedButton.icon(
-                      onPressed: _isComing == null ? null : _trimiteConfirmarea,
-                      icon:
-                          const Icon(Icons.send, size: 16, color: Colors.white),
-                      label: const Text('TRIMITE CONFIRMAREA'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey[400],
-                        shape: const BeveledRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 30, vertical: 15),
-                      ),
-                    )
-            ],
-          ),
-        ),
-        // Stampila decorativă RSVP
-        Positioned(
-          top: 0,
-          right: 0,
-          child: Transform.rotate(
-            angle: 0.2,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: const BoxDecoration(
-                  color: Colors.black, shape: BoxShape.circle),
-              child: Text('RSVP',
-                  style: GoogleFonts.playfairDisplay(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12)),
             ),
           ),
-        )
-      ],
+
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              children: [
+                Text(
+                  'CONFIRMAȚI PREZENȚA',
+                  style: GoogleFonts.playfairDisplay(
+                      fontSize: 24, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Vă rugăm să ne răspundeți până la 20 iulie 2026',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.lora(
+                      fontStyle: FontStyle.italic, color: Colors.black54),
+                ),
+                const SizedBox(height: 30),
+
+                // Câmp Nume
+                TextField(
+                  controller: _numeController,
+                  cursorColor: Colors.black,
+                  style: GoogleFonts.lora(),
+                  decoration: InputDecoration(
+                    labelText: 'Cine ne onorează cu prezența?',
+                    hintText: 'Ex: Familia Ionescu / Bianca și Bogdan',
+                    labelStyle:
+                        GoogleFonts.playfairDisplay(color: Colors.black87),
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black26)),
+                    focusedBorder: const OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Colors.black, width: 1.5)),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Întrebarea Participare
+                Text('Veți fi alături de noi?',
+                    style: GoogleFonts.playfairDisplay(
+                        fontWeight: FontWeight.bold, fontSize: 16)),
+                const SizedBox(height: 8),
+                _buildRadioOption(
+                  title: 'Da, abia așteptăm!',
+                  value: true,
+                  groupValue: _isComing,
+                  onChanged: (v) => setState(() => _isComing = v),
+                ),
+                _buildRadioOption(
+                  title: 'Din păcate, nu putem ajunge',
+                  value: false,
+                  groupValue: _isComing,
+                  onChanged: (v) => setState(() => _isComing = v),
+                ),
+
+                // SECȚIUNE CONDIȚIONATĂ: DATE SUPLIMENTARE
+                if (_isComing == true) ...[
+                  const SizedBox(height: 24),
+                  const Divider(),
+                  const SizedBox(height: 16),
+
+                  // Rând pentru Număr Persoane și Meniu Vegetarian
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // INPUT NUMBER: NR PERSOANE
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Nr. persoane',
+                                style: GoogleFonts.playfairDisplay(
+                                    fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 8),
+                            TextField(
+                              controller: _nrPersoaneController,
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              decoration: const InputDecoration(
+                                contentPadding:
+                                    EdgeInsets.symmetric(vertical: 10),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.black26)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.black)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+
+                      // MENIU VEGETARIAN
+                      Expanded(
+                        flex: 3,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Meniu vegetarian?',
+                                style: GoogleFonts.playfairDisplay(
+                                    fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                _buildSimpleChip('DA', _isVegetarian == true,
+                                    () => setState(() => _isVegetarian = true)),
+                                const SizedBox(width: 8),
+                                _buildSimpleChip(
+                                    'NU',
+                                    _isVegetarian == false,
+                                    () =>
+                                        setState(() => _isVegetarian = false)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+
+                const SizedBox(height: 40),
+
+                _isLoading
+                    ? const CircularProgressIndicator(color: Colors.black)
+                    : SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed:
+                              _isComing == null ? null : _trimiteConfirmarea,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            disabledBackgroundColor: Colors.grey[300],
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero),
+                          ),
+                          child: Text(
+                            'TRIMITE CONFIRMAREA',
+                            style: GoogleFonts.montserrat(
+                                fontWeight: FontWeight.bold, letterSpacing: 1),
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRadioOption(
+      {required String title,
+      required bool value,
+      required bool? groupValue,
+      required Function(bool?) onChanged}) {
+    return InkWell(
+      onTap: () => onChanged(value),
+      child: Row(
+        children: [
+          Radio<bool>(
+            value: value,
+            groupValue: groupValue,
+            activeColor: Colors.black,
+            onChanged: onChanged,
+          ),
+          Text(title, style: GoogleFonts.lora(fontSize: 15)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSimpleChip(String label, bool isSelected, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black : Colors.transparent,
+          border: Border.all(color: Colors.black),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.montserrat(
+            color: isSelected ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+          ),
+        ),
+      ),
     );
   }
 }
