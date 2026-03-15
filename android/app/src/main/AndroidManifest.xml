@@ -12,7 +12,7 @@
         </intent>
     </queries>
     <application
-        android:label="nunta_aa"
+        android:label="Nunta Andreea & Adelin"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
