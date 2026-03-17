@@ -78,7 +78,7 @@ class NewspaperLayout extends StatelessWidget {
           // Centram pe orizontala
           child: Container(
             constraints:
-                const BoxConstraints(maxWidth: 800), // Latime optima de citit
+                const BoxConstraints(maxWidth: 1000), // Latime optima de citit
             decoration: BoxDecoration(
               color: const Color(0xFFFDFBF7),
               boxShadow: kIsWeb
@@ -100,8 +100,9 @@ class NewspaperLayout extends StatelessWidget {
                   SizedBox(height: 30),
                   HeroSection(),
                   SectionDivider(),
-                  CountdownSection(targetDateStr: "2026-09-12 14:00:00"),
+                  CountdownSection(targetDateStr: "2026-09-12 17:00:00"),
                   SizedBox(height: 30),
+                  SectionDivider(),
                   MemoriesSection(),
                   SectionDivider(),
                   LocationsSection(),
@@ -804,7 +805,7 @@ class NewspaperHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildMetaText('RÂMNICU SĂRAT, ROMÂNIA'),
+              _buildMetaText('RÂMNICU SĂRAT'),
               _buildMetaText('SÂMBĂTĂ, 12 SEPT, 2026'),
             ],
           ),
@@ -829,6 +830,7 @@ class NewspaperHeader extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            /** TODO: sterge */
             const Icon(Icons.star, size: 14),
             const SizedBox(width: 4),
             _buildMetaText('EDIȚIE SPECIALĂ'),
@@ -866,7 +868,7 @@ class HeroSection extends StatelessWidget {
         defaultValue: 'https://YOUR_PHOTO_URL/photo');
     return Column(
       children: [
-        Text('CEA MAI FRUMOASĂ ZI DIN VIAȚA LOR',
+        Text('CEA MAI SPECIALĂ ZI',
             style: GoogleFonts.playfairDisplay(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -887,7 +889,7 @@ class HeroSection extends StatelessWidget {
                   style: GoogleFonts.playfairDisplay(
                       fontSize: 30,
                       fontStyle: FontStyle.italic,
-                      color: Colors.grey)),
+                      color: Colors.black)),
               const TextSpan(text: ' Adelin'),
             ],
           ),
@@ -922,35 +924,12 @@ class HeroSection extends StatelessWidget {
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey[300]!)),
                   padding: const EdgeInsets.all(4),
-                  child: ColorFiltered(
-                    colorFilter: const ColorFilter.matrix(<double>[
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0.2126,
-                      0.7152,
-                      0.0722,
-                      0,
-                      0,
-                      0,
-                      0,
-                      0,
-                      1,
-                      0,
-                    ]),
-                    child: Image.network(
-                      photoUrl,
-                      height: 800,
-                      width: 600,
-                      fit: BoxFit.cover,
-                    ),
+                  child: Image.network(
+                    photoUrl,
+                    // TODO: mai taie poza de jos in sus
+                    height: 600,
+                    width: 600,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 8),
