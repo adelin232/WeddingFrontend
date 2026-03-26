@@ -1,0 +1,15 @@
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/icudtl.dat
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/flutter_windows.dll
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/file_selector_windows_plugin.dll
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/share_plus_plugin.dll
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/url_launcher_windows_plugin.dll
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/AssetManifest.bin
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/AssetManifest.json
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/assets/videos/intro.mp4
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/FontManifest.json
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/fonts/MaterialIcons-Regular.otf
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/kernel_blob.bin
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/NOTICES
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/NOTICES.Z
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf
+C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/runner/Debug/data/flutter_assets/shaders/ink_sparkle.frag

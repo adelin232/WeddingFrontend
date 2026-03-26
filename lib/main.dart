@@ -797,20 +797,6 @@ class NewspaperHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.only(bottom: 8),
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Colors.black87, width: 1)),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildMetaText('RÂMNICU SĂRAT'),
-              _buildMetaText('SÂMBĂTĂ, 12 SEPT, 2026'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
         Text(
           'Ziarul de Nuntă',
           textAlign: TextAlign.center,
@@ -825,23 +811,37 @@ class NewspaperHeader extends StatelessWidget {
               bottom: BorderSide(color: Colors.black, width: 1),
             ),
           ),
+        ), 
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.only(bottom: 8),
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.black87, width: 1)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildMetaText('RÂMNICU SĂRAT'),
+              _buildMetaText('SÂMBĂTĂ, 12 SEPT, 2026'),
+            ],
+          ),
         ),
         const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            /** TODO: sterge */
-            const Icon(Icons.star, size: 14),
-            const SizedBox(width: 4),
-            _buildMetaText('EDIȚIE SPECIALĂ'),
-            const SizedBox(width: 15),
-            const CircleAvatar(radius: 3, backgroundColor: Colors.black),
-            const SizedBox(width: 15),
-            const Icon(Icons.favorite, size: 14),
-            const SizedBox(width: 4),
-            _buildMetaText('VOLUMUL I'),
-          ],
-        )
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     /** TODO: sterge */
+        //     const Icon(Icons.star, size: 14),
+        //     const SizedBox(width: 4),
+        //     _buildMetaText('EDIȚIE SPECIALĂ'),
+        //     const SizedBox(width: 15),
+        //     const CircleAvatar(radius: 3, backgroundColor: Colors.black),
+        //     const SizedBox(width: 15),
+        //     const Icon(Icons.favorite, size: 14),
+        //     const SizedBox(width: 4),
+        //     _buildMetaText('VOLUMUL I'),
+        //   ],
+        // )
       ],
     );
   }
@@ -937,9 +937,19 @@ class HeroSection extends StatelessWidget {
                     style: GoogleFonts.playfairDisplay(
                         fontSize: 10,
                         fontStyle: FontStyle.italic,
-                        color: Colors.grey[600]))
+                        color: Colors.grey[600])),
               ],
             ),
+          ),
+        ),
+         const SizedBox(height: 8),
+         Text(
+          'Vă invităm să fiți alături de noi când vom rosti legămintele de dragoste. Ne-ar face deosebită  plăcere să sărbătorim împreună acest moment special din viața noastră.',
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 6.0, // Spațiere mare pentru eleganță
+            fontStyle: FontStyle.italic,
           ),
         ),
       ],

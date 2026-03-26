@@ -1,0 +1,10 @@
+^C:\E-GOVERNANCE\NUNTA 2026\NUNTA_AA\WEDDINGFRONTEND\BUILD\WINDOWS\CMAKEFILES\776F2589E2DCAD8B7C5C9DEB977070AF\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SC:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/windows" "-BC:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/E-Governance/NUNTA 2026/nunta_aa/WeddingFrontend/build/windows/nunta_aa.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

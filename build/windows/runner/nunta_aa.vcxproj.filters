@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\runner\flutter_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\runner\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\runner\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\runner\win32_window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\flutter\generated_plugin_registrant.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\runner\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="C:\E-Governance\NUNTA 2026\nunta_aa\WeddingFrontend\windows\runner\Runner.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4B336CED-6267-3B8D-AA95-607A9DFF11DF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
