@@ -187,7 +187,7 @@ class NewspaperHeader extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2)),
-            Text('12 SEPTEMBRIE 2026',
+            Text('12 SEPT. 2026',
                 style: GoogleFonts.cinzel(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -218,7 +218,7 @@ class HeroSection extends StatelessWidget {
       children: [
         Text('CEA MAI SPECIALĂ ZI',
             style: GoogleFonts.cinzel(
-                fontSize: 26,
+                fontSize: 24,
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 2.0,
@@ -479,8 +479,9 @@ class TimelineSection extends StatelessWidget {
     return Column(
       children: [
         Text('PROGRAMUL ZILEI',
+            textAlign: TextAlign.center,
             style: GoogleFonts.cinzel(
-                fontSize: 22, fontWeight: FontWeight.bold)),
+                fontSize: 26, fontWeight: FontWeight.bold)),
         const SizedBox(height: 30),
         
         // Construim lista de evenimente
@@ -621,6 +622,7 @@ class LocationsSection extends StatelessWidget {
     return Column(
       children: [
         Text('LOCAȚII IMPORTANTE',
+            textAlign: TextAlign.center,
             style:
                 GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.bold)),
         const SizedBox(height: 30),
@@ -740,6 +742,7 @@ class MemoriesSection extends StatelessWidget {
       child: Column(
         children: [
           Text('COLȚUL AMINTIRILOR',
+              textAlign: TextAlign.center,
               style: GoogleFonts.cinzel(
                   fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
@@ -888,6 +891,7 @@ class _RSVPCardState extends State<RSVPCard> {
             child: Column(
               children: [
                 Text('CONFIRMAȚI PREZENȚA',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.cinzel(
                         fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
@@ -1033,11 +1037,11 @@ class BottomActionSection extends StatelessWidget {
         const SizedBox(height: 20),
         Text('CONTACT',
             style:
-                GoogleFonts.cinzel(fontSize: 20, fontWeight: FontWeight.bold)),
+                GoogleFonts.cinzel(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),
         Text('Andreea: +40 752 267 736\nAdelin: +40 747 553 042',
             textAlign: TextAlign.center,
-            style: GoogleFonts.lora(fontSize: 18, height: 1.5)),
+            style: GoogleFonts.lora(fontSize: 16, height: 1.5)),
       ],
     );
   }
@@ -1052,7 +1056,7 @@ class NewspaperFooter extends StatelessWidget {
         const Center(child: Icon(Icons.filter_vintage, size: 30)),
         const SizedBox(height: 10),
         Text('Vă așteptăm cu drag!',
-            style: GoogleFonts.lora(fontStyle: FontStyle.italic, fontSize: 22)),
+            style: GoogleFonts.lora(fontStyle: FontStyle.italic, fontSize: 20)),
       ],
     );
   }
