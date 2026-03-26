@@ -73,6 +73,13 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/videos/intro.mp4
+  fonts:
+    - family: Brookshire # Acesta este numele pe care îl vei folosi în cod
+      fonts:
+        - asset: assets/fonts/EfcoBrookshire-Regular.ttf
+          # poți adăuga și variante de weight sau style dacă le ai
+          # weight: 700 
+          # style: italic
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
