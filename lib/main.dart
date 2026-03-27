@@ -107,7 +107,7 @@ class NewspaperLayout extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                   NewspaperHeader(),
                   SizedBox(height: 30),
                   HeroSection(),
@@ -128,7 +128,7 @@ class NewspaperLayout extends StatelessWidget {
                   BottomActionSection(),
                   SizedBox(height: 40),
                   NewspaperFooter(),
-                  SizedBox(height: 30),
+                  SizedBox(height: 20),
                 ],
               ),
             ),
@@ -279,7 +279,7 @@ class HeroSection extends StatelessWidget {
                       height: 600, width: double.infinity, fit: BoxFit.cover),
                 ),
                 const SizedBox(height: 8),
-                Text('Serată la Castelului Cantacuzino, Martie 2026',
+                Text('Serată la Castelul Cantacuzino, Martie 2026',
                     style: GoogleFonts.playfairDisplay(
                         fontSize: 16,
                         fontStyle: FontStyle.italic,
@@ -473,7 +473,7 @@ class TimelineSection extends StatelessWidget {
         'isPartyPhoto': true,
       },
       {
-        'time': '20:30',
+        'time': '20:00',
         'title': 'Dansul Mirilor',
         'loc': 'Ringul de Dans',
         // AICI: Folosește calea corectă către imaginea ta 'dans.png'
@@ -743,25 +743,21 @@ class LocationsSection extends StatelessWidget {
                     style: GoogleFonts.lora(
                         fontSize: 15, fontStyle: FontStyle.italic)),
                 const SizedBox(height: 20),
-                // ... în interiorul _buildLocationTicket ...
                 Container(
                   height: 300,
                   width: double.infinity,
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade400)),
-                  child: kIsWeb
-                      // ÎNVELIM HtmlElementView ÎNTR-UN AbsorbPointer SAU IgnorePointer
-                      // Pentru a nu permite iframe-ului să interfereze cu gestul de scroll al paginii
-                      ? IgnorePointer(
-                          ignoring:
-                              true, // Harta devine pur vizuală (ca o poză). Omul nu poate face zoom/pan pe ea.
-                          child: HtmlElementView(viewType: viewId),
-                        )
-                      : Center(
-                          child: TextButton.icon(
-                              onPressed: () => _launchMap("$name, $address"),
-                              icon: const Icon(Icons.map),
-                              label: const Text("DESCHIDE HARTA"))),
+                  // ÎNLĂTURĂM COMPLET HtmlElementView și lăsăm doar butonul pe toate platformele
+                  child: Center(
+                    child: TextButton.icon(
+                      onPressed: () => _launchMap("$name, $address"),
+                      icon: const Icon(Icons.map,
+                          size: 40, color: Colors.black87),
+                      label: Text("DESCHIDE HARTA",
+                          style: GoogleFonts.montserrat(color: Colors.black87)),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(time,
