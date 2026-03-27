@@ -13,12 +13,15 @@ import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+// Import condiționat: încarcă helper-ul de web DOAR dacă e web
 import 'stub_download_helper.dart'
     if (dart.library.html) 'web_download_helper.dart';
 
 void setupMape() {
+  // 1. Ceremonia Religioasă - Biserica Cuvioasa Parascheva
   registerWebMap('map-biserica',
       'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.266091664396!2d27.035552386773457!3d45.38380289648595!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1556e31b7bfb3%3A0x8775a6c3cc9a9399!2sBiserica%20Cuvioasa%20Parascheva!5e0!3m2!1sro!2sro!4v1773585186168!5m2!1sro!2sro');
+  // 2. Petrecerea - Avo GastroHan
   registerWebMap('map-petrecere',
       'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2802.720173419411!2d27.02906007614609!3d45.37464147107268!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40b1559d8c478857%3A0x480d1008d5447391!2sAvo%20GastroHan!5e0!3m2!1sro!2sro!4v1768991399344!5m2!1sro!2sro');
 }
@@ -66,19 +69,21 @@ class NewspaperLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        // AICI SETĂM IMAGINEA DE FUNDAL PENTRU TOT ECRANUL
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: const NetworkImage("assets/images/newspaper_bkg.png"), // SAU AssetImage('assets/img.png')
-            fit: BoxFit.cover, // Imaginea acoperă tot ecranul
-            // OPȚIONAL: Dacă imaginea e prea puternică, îi punem o mască albă/crem peste ea
-            colorFilter: ColorFilter.mode(
-              const Color(0xFFEFECE5).withOpacity(0.85), // 0.85 înseamnă 85% opacitate (15% transparență)
-              BlendMode.lighten,
-            ),
+        body: Container(
+      // AICI SETĂM IMAGINEA DE FUNDAL PENTRU TOT ECRANUL
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: const NetworkImage(
+              "assets/images/newspaper_bkg.png"), // SAU AssetImage('assets/img.png')
+          fit: BoxFit.cover, // Imaginea acoperă tot ecranul
+          // OPȚIONAL: Dacă imaginea e prea puternică, îi punem o mască albă/crem peste ea
+          colorFilter: ColorFilter.mode(
+            const Color(0xFFEFECE5).withOpacity(
+                0.85), // 0.85 înseamnă 85% opacitate (15% transparență)
+            BlendMode.lighten,
           ),
         ),
+      ),
       child: SafeArea(
         child: Center(
           child: Container(
@@ -132,8 +137,7 @@ class NewspaperLayout extends StatelessWidget {
           ),
         ),
       ),
-    )
-    );
+    ));
   }
 }
 
@@ -480,57 +484,66 @@ class TimelineSection extends StatelessWidget {
       children: [
         Text('PROGRAMUL ZILEI',
             textAlign: TextAlign.center,
-            style: GoogleFonts.cinzel(
-                fontSize: 26, fontWeight: FontWeight.bold)),
+            style:
+                GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.bold)),
         const SizedBox(height: 30),
-        
+
         // Construim lista de evenimente
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: events.length,
           itemBuilder: (context, index) {
-            bool isLeft = index % 2 == 0; // Alternăm: par = stânga, impar = dreapta
+            bool isLeft =
+                index % 2 == 0; // Alternăm: par = stânga, impar = dreapta
             final event = events[index];
 
             return IntrinsicHeight(
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center, // Aliniem totul pe centru pe orizontală
+                crossAxisAlignment: CrossAxisAlignment
+                    .center, // Aliniem totul pe centru pe orizontală
                 children: [
-                  
                   // --- COLOANA STÂNGĂ ---
                   Expanded(
                     child: isLeft
-                        ? _buildEventText(event, CrossAxisAlignment.end, TextAlign.right)
-                        : _buildEventIcon(event['icon'] as IconData, Alignment.centerRight),
+                        ? _buildEventText(
+                            event, CrossAxisAlignment.end, TextAlign.right)
+                        : _buildEventIcon(
+                            event['icon'] as IconData, Alignment.centerRight),
                   ),
 
                   // --- LINIA CENTRALĂ ---
                   Column(
                     children: [
-                      Container(width: 1, color: Colors.black54, height: 30), // Linia de sus
+                      Container(
+                          width: 1,
+                          color: Colors.black54,
+                          height: 30), // Linia de sus
                       Container(
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.black),
-                          color: const Color(0xFFEFECE5), // Sau culoarea fundalului tău
+                          color: const Color(
+                              0xFFEFECE5), // Sau culoarea fundalului tău
                         ),
                         child: const CircleAvatar(
                             radius: 3, backgroundColor: Colors.black),
                       ),
                       Expanded(
-                          child: Container(width: 1, color: Colors.black54)), // Linia de jos
+                          child: Container(
+                              width: 1, color: Colors.black54)), // Linia de jos
                     ],
                   ),
 
                   // --- COLOANA DREAPTĂ ---
                   Expanded(
                     child: !isLeft
-                        ? _buildEventText(event, CrossAxisAlignment.start, TextAlign.left)
-                        : _buildEventIcon(event['icon'] as IconData, Alignment.centerLeft),
+                        ? _buildEventText(
+                            event, CrossAxisAlignment.start, TextAlign.left)
+                        : _buildEventIcon(
+                            event['icon'] as IconData, Alignment.centerLeft),
                   ),
-                  
                 ],
               ),
             );
@@ -541,10 +554,11 @@ class TimelineSection extends StatelessWidget {
   }
 
   // Metodă separată DOAR pentru Text
-  Widget _buildEventText(
-      Map<String, dynamic> event, CrossAxisAlignment alignment, TextAlign textAlign) {
+  Widget _buildEventText(Map<String, dynamic> event,
+      CrossAxisAlignment alignment, TextAlign textAlign) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20), // Spațiere generoasă
+      padding: const EdgeInsets.symmetric(
+          horizontal: 16, vertical: 20), // Spațiere generoasă
       child: Column(
         crossAxisAlignment: alignment,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -571,7 +585,8 @@ class TimelineSection extends StatelessWidget {
   Widget _buildEventIcon(IconData icon, Alignment alignment) {
     return Container(
       alignment: alignment,
-      padding: const EdgeInsets.symmetric(horizontal: 24), // O distanțăm puțin de linia centrală
+      padding: const EdgeInsets.symmetric(
+          horizontal: 24), // O distanțăm puțin de linia centrală
       child: Icon(
         icon,
         size: 32, // Mărimea iconiței
@@ -1236,49 +1251,91 @@ class _UploadPageState extends State<UploadPage> {
 class GalleryPage extends StatelessWidget {
   const GalleryPage({super.key});
 
+  // Logica ta originală de parsare
   Future<List<String>> fetchImageUrls() async {
     const apiUrl = String.fromEnvironment('GALLERY_URL',
-        defaultValue: 'https://YOUR_API/gallery');
-    if (apiUrl.contains("YOUR_API")) return [];
+        defaultValue: 'https://YOUR_API_GATEWAY_ENDPOINT/gallery');
+
+    // Fallback pentru demo daca nu e setat ENV
+    if (apiUrl.contains("YOUR_API_GATEWAY")) {
+      // Putem returna o listă goală sau demo, dar pentru a respecta logica ta strict:
+      // incercam request-ul, va da eroare 404/host not found si va fi prins in UI
+    }
+
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      if (data is Map && data['images'] is List)
+      if (data is Map && data['images'] is List) {
         return List<String>.from(data['images']);
-      if (data is List) return data.cast<String>();
-      throw Exception('Format necunoscut');
+      }
+      if (data is List) {
+        return data.cast<String>();
+      }
+      if (data is Map && data['photos'] is List) {
+        return (data['photos'] as List)
+            .where((photo) => photo is Map && photo['url'] != null)
+            .map<String>((photo) => photo['url'] as String)
+            .toList();
+      }
+      throw Exception('Format necunoscut de răspuns');
     } else {
-      throw Exception('Eroare retea');
+      throw Exception('Nu s-au putut încărca imaginile');
     }
   }
 
+  // Logica de download (Web safe + Mobile)
   Future<void> _downloadImage(BuildContext context, String url) async {
     try {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Se descarcă...'), duration: Duration(seconds: 1)));
-      final String cacheUrl = url.contains('?')
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Se încearcă descărcarea...'),
+            duration: Duration(seconds: 1)),
+      );
+
+      // Truc: Adăugăm un parametru de timp pentru a forța browserul să nu folosească o versiune veche (fără drepturi) din cache
+      final String cacheBusterUrl = url.contains('?')
           ? '$url&t=${DateTime.now().millisecondsSinceEpoch}'
           : '$url?t=${DateTime.now().millisecondsSinceEpoch}';
-      final response = await http.get(Uri.parse(cacheUrl));
+
+      // Încercăm să descărcăm datele pentru a le redenumi
+      final response = await http.get(Uri.parse(cacheBusterUrl));
+
       if (response.statusCode == 200) {
+        // SUCCES: Putem pune numele dorit
         final Uint8List bytes = response.bodyBytes;
-        final String fileName =
-            "nunta_${DateTime.now().millisecondsSinceEpoch}.jpg";
+        final timestamp = DateTime.now().millisecondsSinceEpoch;
+        final String fileName = "nunta_andreea_adelin_$timestamp.jpg";
+
         if (kIsWeb) {
           downloadWeb(bytes, fileName);
         } else {
+          // Logica pentru aplicație nativă (dacă vei face APK vreodată)
           final tempDir = await getTemporaryDirectory();
           final file = File('${tempDir.path}/$fileName');
           await file.writeAsBytes(bytes);
-          await Share.shareXFiles([XFile(file.path)], text: 'Amintire');
+          await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
         }
       } else {
-        throw 'Eroare HTTP';
+        throw 'Serverul a refuzat conexiunea.';
       }
     } catch (e) {
+      debugPrint("Eroare download inteligent ($e). Se trece la Planul B.");
+
+      // PLAN B: Dacă http.get eșuează (CORS), deschidem link-ul direct.
+      // Utilizatorul va vedea poza și o poate salva cu "Long Press" -> "Save Image"
       try {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      } catch (_) {}
+        await launchUrl(
+          Uri.parse(url),
+          mode: LaunchMode
+              .externalApplication, // Deschide în tab nou / aplicație externă
+        );
+      } catch (e2) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Nu s-a putut deschide imaginea.')),
+          );
+        }
+      }
     }
   }
 
@@ -1295,17 +1352,19 @@ class GalleryPage extends StatelessWidget {
       body: FutureBuilder<List<String>>(
         future: fetchImageUrls(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
                 child: CircularProgressIndicator(color: Colors.black));
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return Center(
                 child: Text('Eroare: ${snapshot.error}',
                     style: GoogleFonts.lora()));
-          if (!snapshot.hasData || snapshot.data!.isEmpty)
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
                 child: Text('Nicio imagine.', style: GoogleFonts.lora()));
-
+          }
           final imageUrls = snapshot.data!;
           return GridView.builder(
             padding: const EdgeInsets.all(16),
