@@ -172,7 +172,7 @@ class NewspaperHeader extends StatelessWidget {
           style: TextStyle(
             fontFamily:
                 'Brookshire', // Numele EXACT din pubspec.yaml (la "family:")
-            fontSize: 48,
+            fontSize: 44,
             color: Colors.black,
           ),
         ),
@@ -233,7 +233,7 @@ class HeroSection extends StatelessWidget {
           text: TextSpan(
             style: GoogleFonts.playfairDisplay(
                 color: Colors.black,
-                fontSize: 48,
+                fontSize: 42,
                 fontWeight: FontWeight.bold,
                 height: 1.0),
             children: [
@@ -241,7 +241,7 @@ class HeroSection extends StatelessWidget {
               TextSpan(
                   text: '&',
                   style: GoogleFonts.playfairDisplay(
-                      fontSize: 36,
+                      fontSize: 32,
                       fontStyle: FontStyle.italic,
                       color: Colors.black54)),
               const TextSpan(text: ' Adelin'),
@@ -279,11 +279,12 @@ class HeroSection extends StatelessWidget {
                       height: 600, width: double.infinity, fit: BoxFit.cover),
                 ),
                 const SizedBox(height: 8),
-                Text('Balul Castelului Cantacuzino, martie 2026',
+                Text('Serată la Castelului Cantacuzino, Martie 2026',
                     style: GoogleFonts.playfairDisplay(
                         fontSize: 16,
                         fontStyle: FontStyle.italic,
-                        color: Colors.grey[600])),
+                        color: Colors.grey[600]),
+                    textAlign: TextAlign.center),
               ],
             ),
           ),
@@ -496,6 +497,7 @@ class TimelineSection extends StatelessWidget {
           'PROGRAMUL NUNȚII',
           style: GoogleFonts.cinzel(
               fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+          textAlign: TextAlign.center,
         ),
         const SizedBox(height: 40),
         ListView.builder(
