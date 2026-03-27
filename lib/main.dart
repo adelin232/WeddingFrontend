@@ -647,7 +647,7 @@ class TimelineSection extends StatelessWidget {
 // }
 
 // -----------------------------------------------------------------------------
-// LOCATII (Cu Harta)
+// LOCATII (Cu Harta Statica pentru Performanta Maxima)
 // -----------------------------------------------------------------------------
 class LocationsSection extends StatelessWidget {
   const LocationsSection({super.key});
@@ -676,7 +676,8 @@ class LocationsSection extends StatelessWidget {
           address: 'Strada Patriei, Râmnicu Sărat',
           time: 'ORA 17:00',
           icon: Icons.church_outlined,
-          viewId: 'map-biserica',
+          // Calea către screenshot-ul cu harta bisericii
+          mapImagePath: 'assets/images/harta_biserica.png',
         ),
         const SizedBox(height: 30),
         _buildLocationTicket(
@@ -686,7 +687,8 @@ class LocationsSection extends StatelessWidget {
           address: 'Strada Stadionului 10, Râmnicu Sărat',
           time: 'ORA 18:30',
           icon: Icons.celebration_outlined,
-          viewId: 'map-petrecere',
+          // Calea către screenshot-ul cu harta restaurantului
+          mapImagePath: 'assets/images/harta_restaurant.png',
         ),
       ],
     );
@@ -698,11 +700,10 @@ class LocationsSection extends StatelessWidget {
       required String address,
       required String time,
       required IconData icon,
-      required String viewId}) {
+      required String mapImagePath}) {
+    // Inlocuit viewId cu mapImagePath
     return Center(
-        // 1. Adaugă Center aici
         child: Container(
-      // 2. Adaugă constraints pentru a limita lățimea maximă la 600px
       constraints: const BoxConstraints(maxWidth: 600),
       width: double.infinity,
       decoration: BoxDecoration(
@@ -743,22 +744,53 @@ class LocationsSection extends StatelessWidget {
                     style: GoogleFonts.lora(
                         fontSize: 15, fontStyle: FontStyle.italic)),
                 const SizedBox(height: 20),
-                Container(
-                  height: 300,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade400)),
-                  // ÎNLĂTURĂM COMPLET HtmlElementView și lăsăm doar butonul pe toate platformele
-                  child: Center(
-                    child: TextButton.icon(
-                      onPressed: () => _launchMap("$name, $address"),
-                      icon: const Icon(Icons.map,
-                          size: 40, color: Colors.black87),
-                      label: Text("DESCHIDE HARTA",
-                          style: GoogleFonts.montserrat(color: Colors.black87)),
+
+                // Zona Hărții (Imagine statică cu GestureDetector)
+                GestureDetector(
+                  onTap: () => _launchMap("$name, $address"),
+                  child: Container(
+                    height: 250, // O inaltime potrivita
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade400),
+                      image: DecorationImage(
+                        image: AssetImage(mapImagePath),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    // Overlay și Buton
+                    child: Container(
+                      color:
+                          Colors.black.withOpacity(0.2), // Întunecare subtilă
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            border: Border.all(color: Colors.black, width: 1),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.location_on,
+                                  color: Colors.black87),
+                              const SizedBox(width: 8),
+                              Text(
+                                "VEZI TRASEUL",
+                                style: GoogleFonts.montserrat(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: Colors.black87),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 20),
                 Text(time,
                     style: GoogleFonts.montserrat(
