@@ -743,13 +743,20 @@ class LocationsSection extends StatelessWidget {
                     style: GoogleFonts.lora(
                         fontSize: 15, fontStyle: FontStyle.italic)),
                 const SizedBox(height: 20),
+                // ... în interiorul _buildLocationTicket ...
                 Container(
                   height: 300,
                   width: double.infinity,
                   decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade400)),
                   child: kIsWeb
-                      ? HtmlElementView(viewType: viewId)
+                      // ÎNVELIM HtmlElementView ÎNTR-UN AbsorbPointer SAU IgnorePointer
+                      // Pentru a nu permite iframe-ului să interfereze cu gestul de scroll al paginii
+                      ? IgnorePointer(
+                          ignoring:
+                              true, // Harta devine pur vizuală (ca o poză). Omul nu poate face zoom/pan pe ea.
+                          child: HtmlElementView(viewType: viewId),
+                        )
                       : Center(
                           child: TextButton.icon(
                               onPressed: () => _launchMap("$name, $address"),
