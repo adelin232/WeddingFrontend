@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -42,7 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ziarul de Nuntă',
+      title: 'Ziarul de Nunta',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -73,8 +72,7 @@ class NewspaperLayout extends StatelessWidget {
       // AICI SETĂM IMAGINEA DE FUNDAL PENTRU TOT ECRANUL
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: const NetworkImage(
-              "assets/images/newspaper_bkg.png"), // SAU AssetImage('assets/img.png')
+          image: const AssetImage("assets/images/newspaper_bkg.png"),
           fit: BoxFit.cover, // Imaginea acoperă tot ecranul
           // OPȚIONAL: Dacă imaginea e prea puternică, îi punem o mască albă/crem peste ea
           colorFilter: ColorFilter.mode(
@@ -123,8 +121,8 @@ class NewspaperLayout extends StatelessWidget {
                   DoubleLineDivider(),
                   LocationsSection(),
                   DoubleLineDivider(),
-                  MemoriesSection(),
-                  DoubleLineDivider(),
+                  // MemoriesSection(),
+                  // DoubleLineDivider(),
                   RSVPCard(),
                   SizedBox(height: 40),
                   BottomActionSection(),
@@ -169,12 +167,12 @@ class NewspaperHeader extends StatelessWidget {
     return Column(
       children: [
         const Text(
-          'Ziarul De Nuntă',
+          'Ziarul De Nunta',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontFamily:
                 'Brookshire', // Numele EXACT din pubspec.yaml (la "family:")
-            fontSize: 54,
+            fontSize: 48,
             color: Colors.black,
           ),
         ),
@@ -425,77 +423,87 @@ class FamilyAndProgramSection extends StatelessWidget {
   //   );
   // }
 
-  Widget _familyGroup(String role, String names) {
-    return Column(
-      children: [
-        Text(role,
-            style: GoogleFonts.montserrat(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-                color: Colors.black54)),
-        const SizedBox(height: 8),
-        Text(names,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
-                fontSize: 18, fontWeight: FontWeight.w600)),
-      ],
-    );
-  }
+//   Widget _familyGroup(String role, String names) {
+//     return Column(
+//       children: [
+//         Text(role,
+//             style: GoogleFonts.montserrat(
+//                 fontSize: 12,
+//                 fontWeight: FontWeight.bold,
+//                 letterSpacing: 2,
+//                 color: Colors.black54)),
+//         const SizedBox(height: 8),
+//         Text(names,
+//             textAlign: TextAlign.center,
+//             style: GoogleFonts.playfairDisplay(
+//                 fontSize: 18, fontWeight: FontWeight.w600)),
+//       ],
+//     );
+//   }
 }
 
 // -----------------------------------------------------------------------------
 // TIMELINE (Alternativ)
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// TIMELINE SECTION (ACTUALIZATĂ: SCALARE ȘI CULORI ORIGINALE)
 // -----------------------------------------------------------------------------
 class TimelineSection extends StatelessWidget {
   const TimelineSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Definirea evenimentelor cu iconițele corespunzătoare
+    // Definirea evenimentelor cu iconițele lor (căi locale PNG din assets)
     final List<Map<String, dynamic>> events = [
       {
         'time': '17:00',
         'title': 'Cununia Religioasă',
         'loc': 'Biserica Cuv. Parascheva',
-        'icon': Icons.church_outlined,
+        'iconPath': 'assets/icons/biserica.png',
+        'isDansPhoto': true,
+        'isPartyPhoto': false,
       },
       {
         'time': '18:30',
         'title': 'Petrecerea',
         'loc': 'Avo GastroHan',
-        'icon': Icons.celebration_outlined,
+        'iconPath': 'assets/icons/petrecere.png',
+        'isDansPhoto': true,
+        'isPartyPhoto': true,
       },
       {
-        'time': '20:00',
+        'time': '20:30',
         'title': 'Dansul Mirilor',
         'loc': 'Ringul de Dans',
-        'icon': Icons.music_note_outlined,
+        // AICI: Folosește calea corectă către imaginea ta 'dans.png'
+        'iconPath': 'assets/icons/dans.png',
+        'isDansPhoto': true,
+        'isPartyPhoto': false,
       },
       {
         'time': '01:00',
         'title': 'Tortul Mirilor',
         'loc': 'Sala Principală',
-        'icon': Icons.cake_outlined,
+        'iconPath': 'assets/icons/tort.png',
+        'isDansPhoto': true,
+        'isPartyPhoto': false,
       },
     ];
 
     return Column(
       children: [
-        Text('PROGRAMUL ZILEI',
-            textAlign: TextAlign.center,
-            style:
-                GoogleFonts.cinzel(fontSize: 26, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 30),
-
-        // Construim lista de evenimente
+        Text(
+          'PROGRAMUL NUNȚII',
+          style: GoogleFonts.cinzel(
+              fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+        ),
+        const SizedBox(height: 40),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: events.length,
           itemBuilder: (context, index) {
-            bool isLeft =
-                index % 2 == 0; // Alternăm: par = stânga, impar = dreapta
+            bool isLeft = index % 2 == 0;
             final event = events[index];
 
             return IntrinsicHeight(
@@ -508,41 +516,25 @@ class TimelineSection extends StatelessWidget {
                     child: isLeft
                         ? _buildEventText(
                             event, CrossAxisAlignment.end, TextAlign.right)
-                        : _buildEventIcon(
-                            event['icon'] as IconData, Alignment.centerRight),
+                        // AICI: Apelăm noua funcție de randare a imaginii/iconiței
+                        : _buildEventVisual(
+                            event['iconPath'] as String, Alignment.centerRight,
+                            isDansPhoto: event['isDansPhoto'] as bool,
+                            isPartyPhoto: event['isPartyPhoto'] as bool),
                   ),
 
-                  // --- LINIA CENTRALĂ ---
-                  Column(
-                    children: [
-                      Container(
-                          width: 1,
-                          color: Colors.black54,
-                          height: 30), // Linia de sus
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black),
-                          color: const Color(
-                              0xFFEFECE5), // Sau culoarea fundalului tău
-                        ),
-                        child: const CircleAvatar(
-                            radius: 3, backgroundColor: Colors.black),
-                      ),
-                      Expanded(
-                          child: Container(
-                              width: 1, color: Colors.black54)), // Linia de jos
-                    ],
-                  ),
+                  // --- LINIA CENTRALĂ (Rămâne neschimbată) ---
+                  _buildTimelineDivider(),
 
                   // --- COLOANA DREAPTĂ ---
                   Expanded(
                     child: !isLeft
                         ? _buildEventText(
                             event, CrossAxisAlignment.start, TextAlign.left)
-                        : _buildEventIcon(
-                            event['icon'] as IconData, Alignment.centerLeft),
+                        // AICI: Apelăm noua funcție de randare a imaginii/iconiței
+                        : _buildEventVisual(
+                            event['iconPath'] as String, Alignment.centerLeft,
+                            isDansPhoto: event['isDansPhoto'] as bool),
                   ),
                 ],
               ),
@@ -553,48 +545,82 @@ class TimelineSection extends StatelessWidget {
     );
   }
 
-  // Metodă separată DOAR pentru Text
+  // --- WIDGET AJUTĂTOR PENTRU LINIA CENTRALĂ ---
+  Widget _buildTimelineDivider() {
+    return Column(
+      children: [
+        Container(width: 1, color: Colors.black38, height: 20),
+        Container(
+          padding: const EdgeInsets.all(3),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.black),
+            color: const Color(0xFFEFECE5), // Fundalul pergament
+          ),
+          child: const CircleAvatar(radius: 3, backgroundColor: Colors.black),
+        ),
+        Expanded(child: Container(width: 1, color: Colors.black38)),
+      ],
+    );
+  }
+
+  // --- WIDGET AJUTĂTOR PENTRU TEXT ---
   Widget _buildEventText(Map<String, dynamic> event,
       CrossAxisAlignment alignment, TextAlign textAlign) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 16, vertical: 20), // Spațiere generoasă
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         crossAxisAlignment: alignment,
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment
+            .center, // Centrare pe verticală în dreptul iconiței
         children: [
           Text(event['time'] as String,
               style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold, fontSize: 14)),
+                  fontWeight: FontWeight.w900, fontSize: 14)),
           Text(event['title'] as String,
               textAlign: textAlign,
               style: GoogleFonts.playfairDisplay(
-                  fontWeight: FontWeight.bold, fontSize: 16)),
+                  fontWeight: FontWeight.bold, fontSize: 18)),
           Text(event['loc'] as String,
               textAlign: textAlign,
               style: GoogleFonts.lora(
                   fontStyle: FontStyle.italic,
-                  fontSize: 12,
+                  fontSize: 13,
                   color: Colors.black54)),
         ],
       ),
     );
   }
 
-  // Metodă separată DOAR pentru Iconiță
-  Widget _buildEventIcon(IconData icon, Alignment alignment) {
+  // --- WIDGET AJUTĂTOR PENTRU IMAGINE/ICON (SOLUȚIA PENTRU ERORI) ---
+  Widget _buildEventVisual(String assetPath, Alignment alignment,
+      {bool isDansPhoto = false, bool isPartyPhoto = false}) {
+    // 1. SCALARE: Dacă e fotografia 'dans.png', o facem mult mai mare (120px)
+    // În caz contrar (iconiță standard), o lăsăm la 40px
+    double size = isDansPhoto ? 80 : 40;
+    double size2 = isPartyPhoto ? 120 : 40;
+
     return Container(
       alignment: alignment,
-      padding: const EdgeInsets.symmetric(
-          horizontal: 24), // O distanțăm puțin de linia centrală
-      child: Icon(
-        icon,
-        size: 32, // Mărimea iconiței
-        color: Colors.black87,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      // Adăugăm un pic de padding vertical dacă e fotografia mare, ca să nu înghesuie textul
+      margin: EdgeInsets.symmetric(vertical: isDansPhoto ? 10 : 0),
+      child: Image.asset(
+        assetPath,
+        width: isPartyPhoto ? size2 : size,
+        height: isPartyPhoto ? size2 : size,
+        fit: isDansPhoto
+            ? BoxFit.contain
+            : BoxFit.contain, // contain asigură că se vede toată
+
+        // 2. FĂRĂ FILL CU NEGRU: Dacă e fotografia 'dans.png', setăm color la 'null' (fără tintă)
+        // În caz contrar, lăsăm 'Colors.black87' pentru a colora iconițele standard
+        color: isDansPhoto ? null : Colors.black87,
       ),
     );
   }
 }
+
 // -----------------------------------------------------------------------------
 // POVESTEA DE DRAGOSTE
 // -----------------------------------------------------------------------------
@@ -671,7 +697,11 @@ class LocationsSection extends StatelessWidget {
       required String time,
       required IconData icon,
       required String viewId}) {
-    return Container(
+    return Center(
+        // 1. Adaugă Center aici
+        child: Container(
+      // 2. Adaugă constraints pentru a limita lățimea maximă la 600px
+      constraints: const BoxConstraints(maxWidth: 600),
       width: double.infinity,
       decoration: BoxDecoration(
           color: Colors.white,
@@ -735,7 +765,7 @@ class LocationsSection extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
 
@@ -880,13 +910,16 @@ class _RSVPCardState extends State<RSVPCard> {
     bool isFormValid = _isComing == false ||
         (_isComing == true && (_nrMeniuClasic + _nrMeniuVegetarian) > 0);
 
-    return Container(
+    return Center(
+        child: Container(
+      constraints: const BoxConstraints(maxWidth: 600),
       decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.black, width: 1),
-          boxShadow: const [
-            BoxShadow(color: Colors.black12, offset: Offset(4, 4))
-          ]),
+        color: Colors.white,
+        border: Border.all(color: Colors.black, width: 1),
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, offset: Offset(4, 4))
+        ],
+      ),
       child: Column(
         children: [
           Container(
@@ -987,7 +1020,7 @@ class _RSVPCardState extends State<RSVPCard> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildRadioOption(String title, bool value) {
