@@ -121,8 +121,8 @@ class NewspaperLayout extends StatelessWidget {
                   DoubleLineDivider(),
                   LocationsSection(),
                   DoubleLineDivider(),
-                  // MemoriesSection(),
-                  // DoubleLineDivider(),
+                  MemoriesSection(),
+                  DoubleLineDivider(),
                   RSVPCard(),
                   SizedBox(height: 40),
                   BottomActionSection(),
@@ -812,12 +812,14 @@ class MemoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 300,
+    return Center(
+        child: Container(
+      constraints: const BoxConstraints(maxWidth: 600),
+      width: double.infinity,
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black87, width: 1),
-        color: Colors.white.withOpacity(0.4),
+        color: Colors.white,
       ),
       child: Column(
         children: [
@@ -871,7 +873,7 @@ class MemoriesSection extends StatelessWidget {
           )
         ],
       ),
-    );
+    ));
   }
 }
 
@@ -1173,7 +1175,9 @@ class _UploadPageState extends State<UploadPage> {
       final pickedFiles = await picker.pickMultiImage();
       if (pickedFiles.isNotEmpty) {
         final images = <Uint8List>[];
-        for (final file in pickedFiles) images.add(await file.readAsBytes());
+        for (final file in pickedFiles) {
+          images.add(await file.readAsBytes());
+        }
         setState(() {
           _webImages = images;
           _selectedImages = [];
@@ -1199,14 +1203,16 @@ class _UploadPageState extends State<UploadPage> {
     try {
       var request = http.MultipartRequest('POST', uri);
       if (kIsWeb) {
-        for (int i = 0; i < _webImages.length; i++)
+        for (int i = 0; i < _webImages.length; i++) {
           request.files.add(http.MultipartFile.fromBytes('files', _webImages[i],
               filename: 'img_$i.jpg'));
+        }
       } else {
-        for (int i = 0; i < _selectedImages.length; i++)
+        for (int i = 0; i < _selectedImages.length; i++) {
           request.files.add(await http.MultipartFile.fromPath(
               'files', _selectedImages[i].path,
               filename: 'img_$i.jpg'));
+        }
       }
       final response = await request.send();
       setState(() => _isUploading = false);
@@ -1238,80 +1244,91 @@ class _UploadPageState extends State<UploadPage> {
                   fontSize: 22, fontWeight: FontWeight.bold)),
           centerTitle: true,
           backgroundColor: const Color(0xFFEFECE5)),
+      // TODO: in ziua nuntii -> porneste partea de upload
       body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 600),
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Text('Ați surprins un moment special?',
-                  style: GoogleFonts.playfairDisplay(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              Text('Încărcați fotografiile aici.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(color: Colors.grey[700])),
-              const SizedBox(height: 30),
-              OutlinedButton.icon(
-                onPressed: _pickImages,
-                icon: const Icon(Icons.folder_open, color: Colors.black),
-                label: const Text('SELECTEAZĂ',
-                    style: TextStyle(color: Colors.black)),
-                style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.black),
-                    shape: const BeveledRectangleBorder(
-                        borderRadius: BorderRadius.zero),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15)),
-              ),
-              const SizedBox(height: 20),
-              if (hasImages) ...[
-                SizedBox(
-                  height: 120,
-                  child: Scrollbar(
-                    controller: _scrollController,
-                    thumbVisibility: true,
-                    child: ListView.separated(
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: imageCount,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) {
-                        return Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black)),
-                          child: kIsWeb
-                              ? Image.memory(_webImages[index],
-                                  width: 100, height: 100, fit: BoxFit.cover)
-                              : Image.file(_selectedImages[index],
-                                  width: 100, height: 100, fit: BoxFit.cover),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                if (_isUploading)
-                  const CircularProgressIndicator(color: Colors.black)
-                else
-                  ElevatedButton.icon(
-                    onPressed: _submitImages,
-                    icon: const Icon(Icons.send, color: Colors.white),
-                    label: const Text('TRIMITE'),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        shape: const BeveledRectangleBorder(
-                            borderRadius: BorderRadius.zero),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 40, vertical: 15)),
-                  ),
-              ]
-            ],
-          ),
-        ),
-      ),
+          child: Container(
+              constraints: const BoxConstraints(maxWidth: 600),
+              padding: const EdgeInsets.all(24),
+              child: Column(children: [
+                Text('Veți putea încărca fotografii în ziua evenimentului!',
+                    style: GoogleFonts.playfairDisplay(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+              ]))),
+      // body: Center(
+      //   child: Container(
+      //     constraints: const BoxConstraints(maxWidth: 600),
+      //     padding: const EdgeInsets.all(24),
+      //     child: Column(
+      //       children: [
+      //         Text('Ați surprins un moment special?',
+      //             style: GoogleFonts.playfairDisplay(
+      //                 fontSize: 20, fontWeight: FontWeight.bold)),
+      //         const SizedBox(height: 10),
+      //         Text('Încărcați fotografiile aici.',
+      //             textAlign: TextAlign.center,
+      //             style: GoogleFonts.lora(color: Colors.grey[700])),
+      //         const SizedBox(height: 30),
+      //         OutlinedButton.icon(
+      //           onPressed: _pickImages,
+      //           icon: const Icon(Icons.folder_open, color: Colors.black),
+      //           label: const Text('SELECTEAZĂ',
+      //               style: TextStyle(color: Colors.black)),
+      //           style: OutlinedButton.styleFrom(
+      //               side: const BorderSide(color: Colors.black),
+      //               shape: const BeveledRectangleBorder(
+      //                   borderRadius: BorderRadius.zero),
+      //               padding: const EdgeInsets.symmetric(
+      //                   horizontal: 30, vertical: 15)),
+      //         ),
+      //         const SizedBox(height: 20),
+      //         if (hasImages) ...[
+      //           SizedBox(
+      //             height: 120,
+      //             child: Scrollbar(
+      //               controller: _scrollController,
+      //               thumbVisibility: true,
+      //               child: ListView.separated(
+      //                 controller: _scrollController,
+      //                 scrollDirection: Axis.horizontal,
+      //                 itemCount: imageCount,
+      //                 separatorBuilder: (_, __) => const SizedBox(width: 12),
+      //                 itemBuilder: (context, index) {
+      //                   return Container(
+      //                     padding: const EdgeInsets.all(4),
+      //                     decoration: BoxDecoration(
+      //                         border: Border.all(color: Colors.black)),
+      //                     child: kIsWeb
+      //                         ? Image.memory(_webImages[index],
+      //                             width: 100, height: 100, fit: BoxFit.cover)
+      //                         : Image.file(_selectedImages[index],
+      //                             width: 100, height: 100, fit: BoxFit.cover),
+      //                   );
+      //                 },
+      //               ),
+      //             ),
+      //           ),
+      //           const SizedBox(height: 24),
+      //           if (_isUploading)
+      //             const CircularProgressIndicator(color: Colors.black)
+      //           else
+      //             ElevatedButton.icon(
+      //               onPressed: _submitImages,
+      //               icon: const Icon(Icons.send, color: Colors.white),
+      //               label: const Text('TRIMITE'),
+      //               style: ElevatedButton.styleFrom(
+      //                   backgroundColor: Colors.black,
+      //                   foregroundColor: Colors.white,
+      //                   shape: const BeveledRectangleBorder(
+      //                       borderRadius: BorderRadius.zero),
+      //                   padding: const EdgeInsets.symmetric(
+      //                       horizontal: 40, vertical: 15)),
+      //             ),
+      //         ]
+      //       ],
+      //     ),
+      //   ),
+      // ),
     );
   }
 }
@@ -1417,117 +1434,127 @@ class GalleryPage extends StatelessWidget {
           centerTitle: true,
           backgroundColor: const Color(0xFFEFECE5)),
       backgroundColor: const Color(0xFFEFECE5),
-      body: FutureBuilder<List<String>>(
-        future: fetchImageUrls(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator(color: Colors.black));
-          }
-          if (snapshot.hasError) {
-            return Center(
-                child: Text('Eroare: ${snapshot.error}',
-                    style: GoogleFonts.lora()));
-          }
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-                child: Text('Nicio imagine.', style: GoogleFonts.lora()));
-          }
-          final imageUrls = snapshot.data!;
-          return GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.85),
-            itemCount: imageUrls.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () => showDialog(
-                  context: context,
-                  builder: (_) => Dialog(
-                    backgroundColor: Colors.transparent,
-                    insetPadding: const EdgeInsets.all(10),
-                    child: Stack(
-                      alignment: Alignment.topRight,
-                      children: [
-                        Container(
-                          constraints: BoxConstraints(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height * 0.8,
-                              maxWidth: 800),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(2)),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Expanded(
-                                  child: Image.network(imageUrls[index],
-                                      fit: BoxFit.contain)),
-                              const SizedBox(height: 10),
-                              ElevatedButton.icon(
-                                  onPressed: () =>
-                                      _downloadImage(context, imageUrls[index]),
-                                  icon: const Icon(Icons.download,
-                                      size: 16, color: Colors.white),
-                                  label: const Text("DESCARCĂ"),
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.black,
-                                      foregroundColor: Colors.white,
-                                      shape: const BeveledRectangleBorder(
-                                          borderRadius: BorderRadius.zero)))
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                            top: 10,
-                            right: 10,
-                            child: IconButton(
-                                icon: const CircleAvatar(
-                                    backgroundColor: Colors.black,
-                                    child: Icon(Icons.close,
-                                        color: Colors.white, size: 20)),
-                                onPressed: () => Navigator.pop(context)))
-                      ],
-                    ),
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(color: Colors.grey[300]!, width: 1),
-                      boxShadow: const [
-                        BoxShadow(color: Colors.black12, offset: Offset(3, 3))
-                      ]),
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                          child: Container(
-                              color: Colors.grey[100],
-                              child: Image.network(imageUrls[index],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (ctx, err, stack) =>
-                                      const Icon(Icons.broken_image)))),
-                      const SizedBox(height: 8),
-                      Text('Foto ${index + 1}',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.playfairDisplay(
-                              fontSize: 12,
-                              fontStyle: FontStyle.italic,
-                              color: Colors.grey)),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+      body: Center(
+          child: Container(
+              constraints: const BoxConstraints(maxWidth: 600),
+              padding: const EdgeInsets.all(24),
+              child: Column(children: [
+                Text('Veți putea vedea fotografiile în ziua evenimentului!',
+                    style: GoogleFonts.playfairDisplay(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+              ]))),
+      // body: FutureBuilder<List<String>>(
+      //   future: fetchImageUrls(),
+      //   builder: (context, snapshot) {
+      //     if (snapshot.connectionState == ConnectionState.waiting) {
+      //       return const Center(
+      //           child: CircularProgressIndicator(color: Colors.black));
+      //     }
+      //     if (snapshot.hasError) {
+      //       return Center(
+      //           child: Text('Eroare: ${snapshot.error}',
+      //               style: GoogleFonts.lora()));
+      //     }
+      //     if (!snapshot.hasData || snapshot.data!.isEmpty) {
+      //       return Center(
+      //           child: Text('Nicio imagine.', style: GoogleFonts.lora()));
+      //     }
+      //     final imageUrls = snapshot.data!;
+      //     return GridView.builder(
+      //       padding: const EdgeInsets.all(16),
+      //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      //           crossAxisCount: 2,
+      //           crossAxisSpacing: 16,
+      //           mainAxisSpacing: 16,
+      //           childAspectRatio: 0.85),
+      //       itemCount: imageUrls.length,
+      //       itemBuilder: (context, index) {
+      //         return GestureDetector(
+      //           onTap: () => showDialog(
+      //             context: context,
+      //             builder: (_) => Dialog(
+      //               backgroundColor: Colors.transparent,
+      //               insetPadding: const EdgeInsets.all(10),
+      //               child: Stack(
+      //                 alignment: Alignment.topRight,
+      //                 children: [
+      //                   Container(
+      //                     constraints: BoxConstraints(
+      //                         maxHeight:
+      //                             MediaQuery.of(context).size.height * 0.8,
+      //                         maxWidth: 800),
+      //                     padding: const EdgeInsets.all(12),
+      //                     decoration: BoxDecoration(
+      //                         color: Colors.white,
+      //                         borderRadius: BorderRadius.circular(2)),
+      //                     child: Column(
+      //                       mainAxisSize: MainAxisSize.min,
+      //                       children: [
+      //                         Expanded(
+      //                             child: Image.network(imageUrls[index],
+      //                                 fit: BoxFit.contain)),
+      //                         const SizedBox(height: 10),
+      //                         ElevatedButton.icon(
+      //                             onPressed: () =>
+      //                                 _downloadImage(context, imageUrls[index]),
+      //                             icon: const Icon(Icons.download,
+      //                                 size: 16, color: Colors.white),
+      //                             label: const Text("DESCARCĂ"),
+      //                             style: ElevatedButton.styleFrom(
+      //                                 backgroundColor: Colors.black,
+      //                                 foregroundColor: Colors.white,
+      //                                 shape: const BeveledRectangleBorder(
+      //                                     borderRadius: BorderRadius.zero)))
+      //                       ],
+      //                     ),
+      //                   ),
+      //                   Positioned(
+      //                       top: 10,
+      //                       right: 10,
+      //                       child: IconButton(
+      //                           icon: const CircleAvatar(
+      //                               backgroundColor: Colors.black,
+      //                               child: Icon(Icons.close,
+      //                                   color: Colors.white, size: 20)),
+      //                           onPressed: () => Navigator.pop(context)))
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //           child: Container(
+      //             decoration: BoxDecoration(
+      //                 color: Colors.white,
+      //                 border: Border.all(color: Colors.grey[300]!, width: 1),
+      //                 boxShadow: const [
+      //                   BoxShadow(color: Colors.black12, offset: Offset(3, 3))
+      //                 ]),
+      //             padding: const EdgeInsets.all(10),
+      //             child: Column(
+      //               crossAxisAlignment: CrossAxisAlignment.stretch,
+      //               children: [
+      //                 Expanded(
+      //                     child: Container(
+      //                         color: Colors.grey[100],
+      //                         child: Image.network(imageUrls[index],
+      //                             fit: BoxFit.cover,
+      //                             errorBuilder: (ctx, err, stack) =>
+      //                                 const Icon(Icons.broken_image)))),
+      //                 const SizedBox(height: 8),
+      //                 Text('Foto ${index + 1}',
+      //                     textAlign: TextAlign.center,
+      //                     style: GoogleFonts.playfairDisplay(
+      //                         fontSize: 12,
+      //                         fontStyle: FontStyle.italic,
+      //                         color: Colors.grey)),
+      //               ],
+      //             ),
+      //           ),
+      //         );
+      //       },
+      //     );
+      //   },
+      // ),
     );
   }
 }
