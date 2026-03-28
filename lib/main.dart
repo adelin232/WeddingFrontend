@@ -597,10 +597,8 @@ class TimelineSection extends StatelessWidget {
   // --- WIDGET AJUTĂTOR PENTRU IMAGINE/ICON (SOLUȚIA PENTRU ERORI) ---
   Widget _buildEventVisual(String assetPath, Alignment alignment,
       {bool isDansPhoto = false, bool isPartyPhoto = false}) {
-    // 1. SCALARE: Dacă e fotografia 'dans.png', o facem mult mai mare (120px)
-    // În caz contrar (iconiță standard), o lăsăm la 40px
     double size = isDansPhoto ? 80 : 40;
-    double size2 = isPartyPhoto ? 120 : 40;
+    double size2 = isPartyPhoto ? 80 : 40;
 
     return Container(
       alignment: alignment,

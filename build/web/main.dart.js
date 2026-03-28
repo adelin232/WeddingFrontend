@@ -81002,7 +81002,7 @@ q=A.bA("PROGRAMUL NUN\u021aII",s,s,s,A.li().$3$fontSize$fontWeight$letterSpacing
 return A.ej(A.a([q,B.ey,new A.xe(new A.a9b(new A.ab7(this,p),4,!0,!0,!0,s),s,B.aB,!1,s,s,B.Jg,!0,s,4,B.an,B.xm,s,B.af,s)],t.p),B.W,B.ac,B.a_)},
 IY(a,b,c){var s=null
 return new A.cL(B.Ds,A.ej(A.a([A.bA(A.bn(a.h(0,"time")),s,s,s,A.pD().$2$fontSize$fontWeight(14,B.bH),s,s),A.bA(A.bn(a.h(0,"title")),s,s,s,A.uK().$2$fontSize$fontWeight(18,B.X),c,s),A.bA(A.bn(a.h(0,"loc")),s,s,s,A.lj().$3$color$fontSize$fontStyle(B.J,13,B.aC),c,s)],t.p),b,B.Iy,B.a_),s)},
-IZ(a,b,c,d){var s=null,r=d?120:40,q=d?r:80,p=d?r:80
+IZ(a,b,c,d){var s=null,r=d?80:40,q=d?r:80,p=d?r:80
 return A.bP(b,new A.qF(A.asO(s,s,new A.ng(a,s,s)),q,p,s,B.zM,s),B.m,s,s,s,s,s,new A.av(0,10,0,10),B.mv,s,s,s)},
 a_y(a,b,c){return this.IZ(a,b,c,!1)}}
 A.ab7.prototype={
