@@ -258,7 +258,7 @@ class HeroSection extends StatelessWidget {
         Transform.rotate(
           angle: -0.01,
           child: Container(
-            width: 500,
+            width: 450,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
                 color: Colors.white,
