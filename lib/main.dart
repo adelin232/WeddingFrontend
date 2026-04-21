@@ -1023,12 +1023,31 @@ class _RSVPCardState extends State<RSVPCard> {
                   const SizedBox(height: 12),
                   _buildMenuRow("Meniu Vegetarian", _nrMeniuVegetarian,
                       (val) => setState(() => _nrMeniuVegetarian = val!)),
+
+                  // --- TEXTUL INFORMATIV ADAUGAT AICI ---
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        'Total invitați: ${_nrMeniuClasic + _nrMeniuVegetarian}',
+                        style: GoogleFonts.lora(
+                          color: Colors.grey,
+                          fontSize: 15,
+                          fontStyle: FontStyle.italic,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // ----------------------------------------
+
                   if (_nrMeniuClasic + _nrMeniuVegetarian == 0)
                     Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Text('* Selectați cel puțin un meniu',
                             style: GoogleFonts.lora(
-                                color: Colors.red[700], fontSize: 12))),
+                                color: Colors.red, fontSize: 12))),
                 ],
                 const SizedBox(height: 40),
                 _isLoading
@@ -1043,7 +1062,7 @@ class _RSVPCardState extends State<RSVPCard> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
-                              disabledBackgroundColor: Colors.grey[300],
+                              disabledBackgroundColor: Colors.grey,
                               shape: const RoundedRectangleBorder(
                                   borderRadius: BorderRadius.zero)),
                           child: Text('TRIMITE CONFIRMAREA',
@@ -1251,6 +1270,7 @@ class _UploadPageState extends State<UploadPage> {
               padding: const EdgeInsets.all(24),
               child: Column(children: [
                 Text('Veți putea încărca fotografii în ziua evenimentului!',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
                         fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
@@ -1440,6 +1460,7 @@ class GalleryPage extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               child: Column(children: [
                 Text('Veți putea vedea fotografiile în ziua evenimentului!',
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.playfairDisplay(
                         fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
