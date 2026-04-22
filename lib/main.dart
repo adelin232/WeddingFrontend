@@ -878,7 +878,7 @@ class MemoriesSection extends StatelessWidget {
 }
 
 // -----------------------------------------------------------------------------
-// RSVP CARD (Stateful cu Dropdown)
+// RSVP CARD (Stateful cu Dropdown și Câmp de Mesaj)
 // -----------------------------------------------------------------------------
 class RSVPCard extends StatefulWidget {
   const RSVPCard({super.key});
@@ -891,10 +891,12 @@ class _RSVPCardState extends State<RSVPCard> {
   int _nrMeniuClasic = 0;
   int _nrMeniuVegetarian = 0;
   final TextEditingController _numeController = TextEditingController();
+  final TextEditingController _mesajController =
+      TextEditingController(); // <-- NOU: Controller pentru mesaj
   bool _isLoading = false;
 
   final String _scriptUrl =
-      "https://script.google.com/macros/s/AKfycbzDf9Hem_sn5ghWNiYRVfdfnHErS9ibub_qwAQ7LEWr3dbWY9eENbtI-A8ywQQDuIiv/exec";
+      "https://script.google.com/macros/s/AKfycbzoCTBULkrG9blHSyQGkqqbY4JMWt5TcCzRJJabI93vAiGkb-crHtNzj6kNS8k-VmlQ/exec";
 
   void _showSnackBar(String message) {
     if (!mounted) return;
@@ -922,11 +924,14 @@ class _RSVPCardState extends State<RSVPCard> {
           "meniuVegetarian": _isComing == true ? _nrMeniuVegetarian : 0,
           "totalPersoane":
               _isComing == true ? (_nrMeniuClasic + _nrMeniuVegetarian) : 0,
+          "mesaj":
+              _mesajController.text.trim(), // <-- NOU: Trimitem și mesajul!
         }),
       );
       if (response.statusCode == 200 || response.statusCode == 302) {
         _showSnackBar('Confirmarea a fost salvată! Vă mulțumim!');
         _numeController.clear();
+        _mesajController.clear(); // <-- Curățăm și mesajul după trimitere
         setState(() {
           _isComing = null;
           _nrMeniuClasic = 0;
@@ -944,8 +949,9 @@ class _RSVPCardState extends State<RSVPCard> {
 
   @override
   Widget build(BuildContext context) {
-    bool isFormValid = _isComing == false ||
-        (_isComing == true && (_nrMeniuClasic + _nrMeniuVegetarian) > 0);
+    int totalInvitati = _nrMeniuClasic + _nrMeniuVegetarian;
+    bool isFormValid =
+        _isComing == false || (_isComing == true && totalInvitati > 0);
 
     return Center(
         child: Container(
@@ -980,11 +986,13 @@ class _RSVPCardState extends State<RSVPCard> {
                     style: GoogleFonts.cinzel(
                         fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text('Vă rugăm să ne răspundeți până la 12 august 2026',
+                Text('Vă rugăm să ne răspundeți până la 12 iulie 2026',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                         fontStyle: FontStyle.italic, color: Colors.black54)),
                 const SizedBox(height: 30),
+
+                // --- Câmp Nume ---
                 TextField(
                   controller: _numeController,
                   cursorColor: Colors.black,
@@ -1002,12 +1010,15 @@ class _RSVPCardState extends State<RSVPCard> {
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                // --- Radio Buttons ---
                 Text('Veți fi alături de noi?',
                     style: GoogleFonts.playfairDisplay(
                         fontWeight: FontWeight.bold, fontSize: 16)),
                 const SizedBox(height: 12),
                 _buildRadioOption('Da, abia așteptăm!', true),
                 _buildRadioOption('Din păcate, nu putem ajunge', false),
+
                 if (_isComing == true) ...[
                   const SizedBox(height: 24),
                   const Divider(),
@@ -1023,32 +1034,46 @@ class _RSVPCardState extends State<RSVPCard> {
                   const SizedBox(height: 12),
                   _buildMenuRow("Meniu Vegetarian", _nrMeniuVegetarian,
                       (val) => setState(() => _nrMeniuVegetarian = val!)),
-
-                  // --- TEXTUL INFORMATIV ADAUGAT AICI ---
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Total invitați: ${_nrMeniuClasic + _nrMeniuVegetarian}',
-                        style: GoogleFonts.lora(
-                          color: Colors.grey,
-                          fontSize: 15,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Total invitați: $totalInvitati',
+                    style: GoogleFonts.lora(
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w600),
                   ),
-                  // ----------------------------------------
-
-                  if (_nrMeniuClasic + _nrMeniuVegetarian == 0)
+                  if (totalInvitati == 0)
                     Padding(
                         padding: const EdgeInsets.only(top: 12),
                         child: Text('* Selectați cel puțin un meniu',
                             style: GoogleFonts.lora(
                                 color: Colors.red, fontSize: 12))),
+
+                  const SizedBox(height: 24),
+
+                  // --- NOU: Câmp Text Multi-linie pentru Mesaj / Cazare ---
+                  TextField(
+                    controller: _mesajController,
+                    cursorColor: Colors.black,
+                    maxLines: 3, // Îl facem mai mare, ca un text area
+                    decoration: InputDecoration(
+                      labelText: 'Mesaj / Alte mențiuni (Opțional)',
+                      hintText:
+                          'Dacă doriți să ne transmiteți un mesaj, o puteți face aici.',
+                      alignLabelWithHint: true, // Aliniază label-ul sus
+                      labelStyle: GoogleFonts.playfairDisplay(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black26)),
+                      focusedBorder: const OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Colors.black, width: 1.5)),
+                    ),
+                  ),
                 ],
+
                 const SizedBox(height: 40),
                 _isLoading
                     ? const CircularProgressIndicator(color: Colors.black)
