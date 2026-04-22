@@ -986,7 +986,7 @@ class _RSVPCardState extends State<RSVPCard> {
                     style: GoogleFonts.cinzel(
                         fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
-                Text('Vă rugăm să ne răspundeți până la 12 iulie 2026',
+                Text('Vă rugăm să ne răspundeți până la 12 august 2026',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                         fontStyle: FontStyle.italic, color: Colors.black54)),
