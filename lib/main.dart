@@ -1344,10 +1344,9 @@ class _UploadPageState extends State<UploadPage> {
                               border: Border.all(color: Colors.black)),
                           // Aici decidem ce arătăm: poză sau iconiță de video
                           child: isVideo
-                              ? const Center(
-                                  child: Icon(Icons.videocam,
-                                      size: 40, color: Colors.black54),
-                                )
+                              ? WebVideoPreview(
+                                  videoPath:
+                                      file.path) // <-- AICI PUI NOUA CLASĂ
                               : kIsWeb
                                   ? Image.network(file.path, fit: BoxFit.cover)
                                   : Image.file(File(file.path),
@@ -1406,8 +1405,9 @@ class GalleryPage extends StatelessWidget {
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      if (data is Map && data['images'] is List)
+      if (data is Map && data['images'] is List) {
         return List<String>.from(data['images']);
+      }
       if (data is List) return data.cast<String>();
       if (data is Map && data['photos'] is List) {
         return (data['photos'] as List)
@@ -1930,6 +1930,64 @@ class _CustomVideoPlayerUIState extends State<CustomVideoPlayerUI> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class WebVideoPreview extends StatefulWidget {
+  final String videoPath; // Aici primește XFile.path
+  const WebVideoPreview({super.key, required this.videoPath});
+
+  @override
+  State<WebVideoPreview> createState() => _WebVideoPreviewState();
+}
+
+class _WebVideoPreviewState extends State<WebVideoPreview> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Inițializăm video-ul din link-ul temporar din browser
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoPath))
+      ..initialize().then((_) {
+        // Când e gata, dăm refresh ca să apară primul cadru
+        if (mounted) setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_controller.value.isInitialized) {
+      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+    }
+
+    // Folosim IgnorePointer ca să nu poată da click pe el (e doar un preview vizual)
+    return IgnorePointer(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+          // Adăugăm o iconiță subtilă peste ca să fie clar că e video
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: const BoxDecoration(
+              color: Colors.black54,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.videocam, color: Colors.white, size: 20),
+          )
+        ],
+      ),
     );
   }
 }
