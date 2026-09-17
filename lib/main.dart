@@ -12,6 +12,7 @@ import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 import 'package:mime/mime.dart';
 
 void setupMape() {
@@ -1676,60 +1677,58 @@ class DialogVideoPlayer extends StatefulWidget {
 }
 
 class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
-  late VideoPlayerController _controller;
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
   bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
-      ..initialize().then((_) {
-        if (mounted) {
-          setState(() {
-            _initialized = true;
+    _videoPlayerController =
+        VideoPlayerController.networkUrl(Uri.parse(widget.url))
+          ..initialize().then((_) {
+            if (mounted) {
+              // Configurăm interfața vizuală a player-ului
+              _chewieController = ChewieController(
+                videoPlayerController: _videoPlayerController,
+                autoPlay: true, // Pornește automat când deschizi popup-ul
+                looping: true,
+                allowFullScreen:
+                    false, // Oprim fullscreen-ul pentru că deja e într-un popup
+                materialProgressColors: ChewieProgressColors(
+                  playedColor: Colors.black, // Culoarea barei de progres
+                  handleColor: Colors.black,
+                  backgroundColor: Colors.grey.shade300,
+                  bufferedColor: Colors.grey.shade500,
+                ),
+              );
+
+              setState(() {
+                _initialized = true;
+              });
+            }
           });
-          _controller.play(); // Auto-play la deschiderea popup-ului
-          _controller.setLooping(true);
-        }
-      });
   }
 
   @override
   void dispose() {
-    _controller.pause();
-    _controller.dispose();
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_initialized) {
+    if (!_initialized || _chewieController == null) {
       return const Center(
           child: CircularProgressIndicator(color: Colors.black));
     }
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _controller.value.isPlaying
-              ? _controller.pause()
-              : _controller.play();
-        });
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
-          if (!_controller.value.isPlaying)
-            Container(
-              decoration: const BoxDecoration(
-                  color: Colors.black45, shape: BoxShape.circle),
-              child:
-                  const Icon(Icons.play_arrow, color: Colors.white, size: 60),
-            ),
-        ],
+
+    return AspectRatio(
+      aspectRatio: _videoPlayerController.value.aspectRatio,
+      // Chewie este widget-ul care randează controalele frumos deasupra videoclipului
+      child: Chewie(
+        controller: _chewieController!,
       ),
     );
   }
