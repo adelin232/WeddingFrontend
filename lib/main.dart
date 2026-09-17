@@ -1749,6 +1749,9 @@ class CustomVideoPlayerUI extends StatefulWidget {
 }
 
 class _CustomVideoPlayerUIState extends State<CustomVideoPlayerUI> {
+  // 1. Variabilă nouă care știe când player-ul este trimis în fullscreen
+  bool _isHidden = false;
+
   void _togglePlay() {
     setState(() {
       if (widget.controller.value.isPlaying) {
@@ -1766,13 +1769,19 @@ class _CustomVideoPlayerUIState extends State<CustomVideoPlayerUI> {
     return "$minutes:$seconds";
   }
 
-  void _toggleFullScreen() {
+  // 2. Logica actualizată de FullScreen
+  void _toggleFullScreen() async {
     if (widget.isFullScreen) {
-      // Dacă suntem în fullscreen, închidem pagina de fullscreen
+      // Dacă suntem în fullscreen, doar închidem pagina
       Navigator.pop(context);
     } else {
-      // Dacă suntem în popup, deschidem o pagină nouă neagră pe tot ecranul
-      Navigator.push(
+      // Dacă suntem în player-ul mic, îl ascundem mai întâi
+      setState(() {
+        _isHidden = true;
+      });
+
+      // Așteptăm (await) ca utilizatorul să termine cu Fullscreen-ul
+      await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => Scaffold(
@@ -1791,27 +1800,40 @@ class _CustomVideoPlayerUIState extends State<CustomVideoPlayerUI> {
           ),
         ),
       );
+
+      // Când s-a închis Fullscreen-ul și codul ajunge din nou aici,
+      // re-afișăm player-ul mic (ceea ce va forța Flutter să repare ecranul alb)
+      if (mounted) {
+        setState(() {
+          _isHidden = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Dacă am plecat în fullscreen, punem un fundal negru în loc de videoclip
+    if (_isHidden) {
+      return Container(color: Colors.black);
+    }
+
     return Stack(
       alignment: Alignment.center,
       children: [
         // STRATUL 1: Videoclipul efectiv (la bază)
         VideoPlayer(widget.controller),
 
-        // STRATUL 2: "Geamul" transparent care interceptează click-urile pentru web
+        // STRATUL 2: "Geamul" transparent care interceptează click-urile
         Positioned.fill(
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: _togglePlay,
             child: Container(color: Colors.transparent),
           ),
         ),
 
         // STRATUL 3: Iconița de Play/Pause pe centru
-        // Folosim IgnorePointer pentru ca click-ul pe ea să treacă prin geamul de la Stratul 2
         IgnorePointer(
           child: AnimatedOpacity(
             opacity: widget.controller.value.isPlaying ? 0.0 : 1.0,
@@ -1851,7 +1873,7 @@ class _CustomVideoPlayerUIState extends State<CustomVideoPlayerUI> {
                 ),
                 const SizedBox(width: 10),
 
-                // Bara de progres (poți da skip)
+                // Bara de progres
                 Expanded(
                   child: VideoProgressIndicator(
                     widget.controller,
