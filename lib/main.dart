@@ -12,7 +12,6 @@ import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/chewie.dart';
 import 'package:mime/mime.dart';
 
 void setupMape() {
@@ -1689,58 +1688,156 @@ class DialogVideoPlayer extends StatefulWidget {
 }
 
 class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
-  late VideoPlayerController _videoPlayerController;
-  ChewieController? _chewieController;
+  late VideoPlayerController _controller;
   bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    _videoPlayerController =
-        VideoPlayerController.networkUrl(Uri.parse(widget.url))
-          ..initialize().then((_) {
-            if (mounted) {
-              // Configurăm controalele Chewie
-              _chewieController = ChewieController(
-                videoPlayerController: _videoPlayerController,
-                autoPlay: true,
-                looping: true,
-                allowFullScreen:
-                    false, // Pe web într-un popup nu avem nevoie de full screen
-                materialProgressColors: ChewieProgressColors(
-                  playedColor: Colors.black,
-                  handleColor: Colors.black,
-                  backgroundColor: Colors.grey.shade300,
-                  bufferedColor: Colors.grey.shade500,
-                ),
-              );
-
-              setState(() {
-                _initialized = true;
-              });
-            }
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _initialized = true;
           });
+          _controller.play();
+          _controller.setLooping(true);
+        }
+      });
+
+    // Ascultăm schimbările ca să se actualizeze în timp real cronometrul și bara
+    _controller.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
   void dispose() {
-    _videoPlayerController.pause();
-    _videoPlayerController.dispose();
-    _chewieController?.dispose();
+    _controller.pause();
+    _controller.dispose();
     super.dispose();
+  }
+
+  void _togglePlay() {
+    setState(() {
+      if (_controller.value.isPlaying) {
+        _controller.pause();
+      } else {
+        _controller.play();
+      }
+    });
+  }
+
+  // Funcție pentru a transforma secundele în format 00:00
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_initialized || _chewieController == null) {
+    if (!_initialized) {
       return const Center(
           child: CircularProgressIndicator(color: Colors.black));
     }
 
     return AspectRatio(
-      aspectRatio: _videoPlayerController.value.aspectRatio,
-      child: Chewie(
-        controller: _chewieController!,
+      aspectRatio: _controller.value.aspectRatio,
+      child: GestureDetector(
+        onTap: _togglePlay, // Click oriunde = Play/Pauză
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // 1. Videoclipul de fundal
+            VideoPlayer(_controller),
+
+            // 2. Iconița centrală elegantă (apare doar pe pauză)
+            AnimatedOpacity(
+              opacity: _controller.value.isPlaying ? 0.0 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: Container(
+                decoration: const BoxDecoration(
+                    color: Colors.black54, shape: BoxShape.circle),
+                padding: const EdgeInsets.all(16),
+                child:
+                    const Icon(Icons.play_arrow, color: Colors.white, size: 50),
+              ),
+            ),
+
+            // 3. Bara de controale jos de tot
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                // Un mic gradient transparent jos de tot doar cat să se vadă textul alb
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.black87],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                )),
+                child: Row(
+                  children: [
+                    // Timp scurs
+                    Text(
+                      _formatDuration(_controller.value.position),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontFamily: 'monospace'),
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Bara de progres (click & drag)
+                    Expanded(
+                      child: VideoProgressIndicator(
+                        _controller,
+                        allowScrubbing: true,
+                        colors: const VideoProgressColors(
+                          playedColor: Colors.white,
+                          backgroundColor: Colors.white38,
+                          bufferedColor: Colors.white54,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Timp total
+                    Text(
+                      _formatDuration(_controller.value.duration),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontFamily: 'monospace'),
+                    ),
+                    const SizedBox(width: 8),
+
+                    // Buton de Mute / Unmute
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _controller.setVolume(
+                              _controller.value.volume > 0 ? 0.0 : 1.0);
+                        });
+                      },
+                      child: Icon(
+                          _controller.value.volume > 0
+                              ? Icons.volume_up
+                              : Icons.volume_off,
+                          color: Colors.white,
+                          size: 20),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
