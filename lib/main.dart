@@ -1746,6 +1746,7 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
     return AspectRatio(
       aspectRatio: _controller.value.aspectRatio,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // <--- ACEASTA ESTE SOLUȚIA
         onTap: _togglePlay, // Click oriunde = Play/Pauză
         child: Stack(
           alignment: Alignment.center,
