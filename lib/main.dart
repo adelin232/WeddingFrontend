@@ -1546,7 +1546,7 @@ class GalleryPage extends StatelessWidget {
                                   onPressed: () => _downloadMedia(context, url),
                                   icon: const Icon(Icons.download,
                                       size: 16, color: Colors.white),
-                                  label: const Text("DESCARCĂ / DESCHIDE"),
+                                  label: const Text("DESCARCĂ"),
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.black,
                                       foregroundColor: Colors.white,
@@ -1700,15 +1700,15 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
         VideoPlayerController.networkUrl(Uri.parse(widget.url))
           ..initialize().then((_) {
             if (mounted) {
-              // Configurăm interfața vizuală a player-ului
+              // Configurăm controalele Chewie
               _chewieController = ChewieController(
                 videoPlayerController: _videoPlayerController,
-                autoPlay: true, // Pornește automat când deschizi popup-ul
+                autoPlay: true,
                 looping: true,
                 allowFullScreen:
-                    false, // Oprim fullscreen-ul pentru că deja e într-un popup
+                    false, // Pe web într-un popup nu avem nevoie de full screen
                 materialProgressColors: ChewieProgressColors(
-                  playedColor: Colors.black, // Culoarea barei de progres
+                  playedColor: Colors.black,
                   handleColor: Colors.black,
                   backgroundColor: Colors.grey.shade300,
                   bufferedColor: Colors.grey.shade500,
@@ -1724,6 +1724,7 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
 
   @override
   void dispose() {
+    _videoPlayerController.pause();
     _videoPlayerController.dispose();
     _chewieController?.dispose();
     super.dispose();
@@ -1738,7 +1739,6 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
 
     return AspectRatio(
       aspectRatio: _videoPlayerController.value.aspectRatio,
-      // Chewie este widget-ul care randează controalele frumos deasupra videoclipului
       child: Chewie(
         controller: _chewieController!,
       ),
