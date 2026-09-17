@@ -13,10 +13,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:mime/mime.dart';
 
-// Import condiționat: încarcă helper-ul de web DOAR dacă e web
-import 'stub_download_helper.dart'
-    if (dart.library.html) 'web_download_helper.dart';
-
 void setupMape() {
   // 1. Ceremonia Religioasă - Biserica Cuvioasa Parascheva
   registerWebMap('map-biserica',
@@ -1388,16 +1384,25 @@ class _UploadPageState extends State<UploadPage> {
 class GalleryPage extends StatelessWidget {
   const GalleryPage({super.key});
 
-  // Logica ta originală de parsare
-  Future<List<String>> fetchImageUrls() async {
+  // Funcție helper pentru a deduce extensia din URL
+  String _getExtension(String url) {
+    final path = Uri.parse(url).path.toLowerCase();
+    if (path.endsWith('.mp4')) return '.mp4';
+    if (path.endsWith('.mov')) return '.mov';
+    if (path.endsWith('.png')) return '.png';
+    if (path.endsWith('.jpeg')) return '.jpeg';
+    return '.jpg'; // default fallback
+  }
+
+  // Funcție helper pentru a verifica dacă e video
+  bool _isVideo(String url) {
+    final ext = _getExtension(url);
+    return ext == '.mp4' || ext == '.mov';
+  }
+
+  Future<List<String>> fetchMediaUrls() async {
     const apiUrl = String.fromEnvironment('GALLERY_URL',
         defaultValue: 'https://YOUR_API_GATEWAY_ENDPOINT/gallery');
-
-    // Fallback pentru demo daca nu e setat ENV
-    if (apiUrl.contains("YOUR_API_GATEWAY")) {
-      // Putem returna o listă goală sau demo, dar pentru a respecta logica ta strict:
-      // incercam request-ul, va da eroare 404/host not found si va fi prins in UI
-    }
 
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
@@ -1416,60 +1421,51 @@ class GalleryPage extends StatelessWidget {
       }
       throw Exception('Format necunoscut de răspuns');
     } else {
-      throw Exception('Nu s-au putut încărca imaginile');
+      throw Exception('Nu s-au putut încărca fișierele');
     }
   }
 
-  // Logica de download (Web safe + Mobile)
-  Future<void> _downloadImage(BuildContext context, String url) async {
+  Future<void> _downloadMedia(BuildContext context, String url) async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Se încearcă descărcarea...'),
-            duration: Duration(seconds: 1)),
+            duration: Duration(seconds: 2)),
       );
 
-      // Truc: Adăugăm un parametru de timp pentru a forța browserul să nu folosească o versiune veche (fără drepturi) din cache
-      final String cacheBusterUrl = url.contains('?')
-          ? '$url&t=${DateTime.now().millisecondsSinceEpoch}'
-          : '$url?t=${DateTime.now().millisecondsSinceEpoch}';
-
-      // Încercăm să descărcăm datele pentru a le redenumi
-      final response = await http.get(Uri.parse(cacheBusterUrl));
+      // IMPORTANT: Am eliminat cacheBusterUrl deoarece strică AWS Pre-signed URLs
+      final response = await http.get(Uri.parse(url));
 
       if (response.statusCode == 200) {
-        // SUCCES: Putem pune numele dorit
         final Uint8List bytes = response.bodyBytes;
         final timestamp = DateTime.now().millisecondsSinceEpoch;
-        final String fileName = "nunta_andreea_adelin_$timestamp.jpg";
+        final ext = _getExtension(url);
+        final String fileName = "nunta_andreea_adelin_$timestamp$ext";
 
         if (kIsWeb) {
-          downloadWeb(bytes, fileName);
+          // Aici trebuie să apelezi funcția ta JS/Web de download
+          // downloadWeb(bytes, fileName);
         } else {
-          // Logica pentru aplicație nativă (dacă vei face APK vreodată)
           final tempDir = await getTemporaryDirectory();
           final file = File('${tempDir.path}/$fileName');
           await file.writeAsBytes(bytes);
           await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
         }
       } else {
-        throw 'Serverul a refuzat conexiunea.';
+        throw 'Serverul a refuzat conexiunea (Status: ${response.statusCode}).';
       }
     } catch (e) {
       debugPrint("Eroare download inteligent ($e). Se trece la Planul B.");
 
-      // PLAN B: Dacă http.get eșuează (CORS), deschidem link-ul direct.
-      // Utilizatorul va vedea poza și o poate salva cu "Long Press" -> "Save Image"
       try {
         await launchUrl(
           Uri.parse(url),
-          mode: LaunchMode
-              .externalApplication, // Deschide în tab nou / aplicație externă
+          mode: LaunchMode.externalApplication,
         );
       } catch (e2) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nu s-a putut deschide imaginea.')),
+            const SnackBar(content: Text('Nu s-a putut deschide fișierul.')),
           );
         }
       }
@@ -1486,19 +1482,8 @@ class GalleryPage extends StatelessWidget {
           centerTitle: true,
           backgroundColor: const Color(0xFFEFECE5)),
       backgroundColor: const Color(0xFFEFECE5),
-      // body: Center(
-      //     child: Container(
-      //         constraints: const BoxConstraints(maxWidth: 600),
-      //         padding: const EdgeInsets.all(24),
-      //         child: Column(children: [
-      //           Text('Veți putea vedea fotografiile în ziua evenimentului!',
-      //               textAlign: TextAlign.center,
-      //               style: GoogleFonts.playfairDisplay(
-      //                   fontSize: 20, fontWeight: FontWeight.bold)),
-      //           const SizedBox(height: 10),
-      //         ]))),
       body: FutureBuilder<List<String>>(
-        future: fetchImageUrls(),
+        future: fetchMediaUrls(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -1511,9 +1496,12 @@ class GalleryPage extends StatelessWidget {
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
-                child: Text('Nicio imagine.', style: GoogleFonts.lora()));
+                child: Text('Niciun fișier încărcat momentan.',
+                    style: GoogleFonts.lora()));
           }
-          final imageUrls = snapshot.data!;
+
+          final mediaUrls = snapshot.data!;
+
           return GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1521,8 +1509,11 @@ class GalleryPage extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 childAspectRatio: 0.85),
-            itemCount: imageUrls.length,
+            itemCount: mediaUrls.length,
             itemBuilder: (context, index) {
+              final url = mediaUrls[index];
+              final isVideo = _isVideo(url);
+
               return GestureDetector(
                 onTap: () => showDialog(
                   context: context,
@@ -1545,12 +1536,35 @@ class GalleryPage extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Expanded(
-                                  child: Image.network(imageUrls[index],
-                                      fit: BoxFit.contain)),
+                                  child: isVideo
+                                      ? Center(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(Icons.play_circle_fill,
+                                                  size: 80,
+                                                  color: Colors.black54),
+                                              const SizedBox(height: 20),
+                                              OutlinedButton.icon(
+                                                onPressed: () => launchUrl(
+                                                    Uri.parse(url),
+                                                    mode: LaunchMode
+                                                        .externalApplication),
+                                                icon: const Icon(
+                                                    Icons.open_in_browser,
+                                                    color: Colors.black),
+                                                label: const Text('VEZI VIDEO',
+                                                    style: TextStyle(
+                                                        color: Colors.black)),
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      : Image.network(url,
+                                          fit: BoxFit.contain)),
                               const SizedBox(height: 10),
                               ElevatedButton.icon(
-                                  onPressed: () =>
-                                      _downloadImage(context, imageUrls[index]),
+                                  onPressed: () => _downloadMedia(context, url),
                                   icon: const Icon(Icons.download,
                                       size: 16, color: Colors.white),
                                   label: const Text("DESCARCĂ"),
@@ -1589,12 +1603,16 @@ class GalleryPage extends StatelessWidget {
                       Expanded(
                           child: Container(
                               color: Colors.grey[100],
-                              child: Image.network(imageUrls[index],
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (ctx, err, stack) =>
-                                      const Icon(Icons.broken_image)))),
+                              child: isVideo
+                                  ? const Center(
+                                      child: Icon(Icons.videocam,
+                                          size: 40, color: Colors.black54))
+                                  : Image.network(url,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (ctx, err, stack) =>
+                                          const Icon(Icons.broken_image)))),
                       const SizedBox(height: 8),
-                      Text('Foto ${index + 1}',
+                      Text(isVideo ? 'Video ${index + 1}' : 'Foto ${index + 1}',
                           textAlign: TextAlign.center,
                           style: GoogleFonts.playfairDisplay(
                               fontSize: 12,
