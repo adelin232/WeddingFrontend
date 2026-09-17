@@ -1426,46 +1426,37 @@ class GalleryPage extends StatelessWidget {
   Future<void> _downloadMedia(BuildContext context, String url) async {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-          content: Text('Se pregătește descărcarea...'),
-          duration: Duration(seconds: 2)),
+          content: Text(
+              'Se descarcă fișierul... (poate dura puțin pentru video-uri mari)'),
+          duration: Duration(seconds: 4)),
     );
 
-    final isVideo = _isVideo(url);
-
-    // PENTRU WEB SAU VIDEO:
-    // Evităm descărcarea în RAM a fișierelor mari. Delegăm sarcina către browser/sistem.
-    if (kIsWeb || isVideo) {
-      try {
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-      } catch (e) {
-        if (context.mounted)
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Eroare la deschidere.')));
-      }
-      return;
-    }
-
-    // PENTRU IMAGINI PE TELEFON (Mobile):
-    // Pozele sunt mici, deci e sigur să le descărcăm și să le dăm share.
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final Uint8List bytes = response.bodyBytes;
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final ext = _getExtension(url);
+        final String fileName = "nunta_andreea_adelin_$timestamp$ext";
 
-        final tempDir = await getTemporaryDirectory();
-        final file =
-            File('${tempDir.path}/nunta_andreea_adelin_$timestamp$ext');
-        await file.writeAsBytes(bytes);
-        await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
+        if (kIsWeb) {
+          // XFile știe automat să declanșeze descărcarea nativă în browser
+          final webFile = XFile.fromData(bytes, name: fileName);
+          await webFile.saveTo(fileName);
+        } else {
+          final tempDir = await getTemporaryDirectory();
+          final file = File('${tempDir.path}/$fileName');
+          await file.writeAsBytes(bytes);
+          await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
+        }
       } else {
         throw 'Eroare HTTP: ${response.statusCode}';
       }
     } catch (e) {
-      if (context.mounted)
+      if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Eroare: $e')));
+            .showSnackBar(SnackBar(content: Text('Eroare la descărcare: $e')));
+      }
     }
   }
 
@@ -1497,15 +1488,27 @@ class GalleryPage extends StatelessWidget {
                     style: GoogleFonts.lora()));
           }
 
+          // 1. Aici definim mediaUrls din datele primite
           final mediaUrls = snapshot.data!;
+
+          // 2. Acum calculăm coloanele (mediaUrls există deja)
+          final screenWidth = MediaQuery.of(context).size.width;
+          int columns = 2; // Default pentru telefon
+          if (screenWidth > 1200) {
+            columns = 5; // Monitoare mari
+          } else if (screenWidth > 800) {
+            columns = 4; // Laptop-uri
+          } else if (screenWidth > 600) {
+            columns = 3; // Tablete
+          }
 
           return GridView.builder(
             padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: columns, // Folosim numărul calculat
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio: 0.85),
+                childAspectRatio: 0.9), // Proporție pentru carduri
             itemCount: mediaUrls.length,
             itemBuilder: (context, index) {
               final url = mediaUrls[index];
@@ -1647,13 +1650,14 @@ class _GridVideoPreviewState extends State<GridVideoPreview> {
       return const Center(
           child: CircularProgressIndicator(color: Colors.white));
     }
-    // AICI E SECRETUL: ClipRect taie excesul vizual care iese din cadru
-    return ClipRect(
-      child: Stack(
-        alignment: Alignment.center,
-        fit: StackFit.expand,
-        children: [
-          FittedBox(
+
+    return Stack(
+      alignment: Alignment.center,
+      fit: StackFit.expand,
+      children: [
+        // 1. Videoclipul de fundal (tăiat frumos cu ClipRect)
+        ClipRect(
+          child: FittedBox(
             fit: BoxFit.cover,
             child: SizedBox(
               width: _controller.value.size.width,
@@ -1661,9 +1665,17 @@ class _GridVideoPreviewState extends State<GridVideoPreview> {
               child: VideoPlayer(_controller),
             ),
           ),
-          const Icon(Icons.play_circle_outline, color: Colors.white, size: 40),
-        ],
-      ),
+        ),
+
+        // 2. SECRETUL PENTRU WEB: Un strat complet transparent care absoarbe click-urile
+        // și le trimite către GestureDetector-ul tău principal, peste player-ul HTML.
+        Positioned.fill(
+          child: Container(color: Colors.transparent),
+        ),
+
+        // 3. Iconița de play
+        const Icon(Icons.play_circle_outline, color: Colors.white, size: 40),
+      ],
     );
   }
 }
