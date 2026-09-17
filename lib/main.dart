@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:mime/mime.dart';
 
 // Import condiționat: încarcă helper-ul de web DOAR dacă e web
 import 'stub_download_helper.dart'
@@ -1192,7 +1193,7 @@ class NewspaperFooter extends StatelessWidget {
 }
 
 // =============================================================================
-// PAGINILE UPLOAD & GALLERY (Neschimbate ca logica, doar adaptate stilistic)
+// PAGINILE UPLOAD & GALLERY (Adaptate pentru S3 Pre-signed URLs)
 // =============================================================================
 
 class UploadPage extends StatefulWidget {
@@ -1202,8 +1203,8 @@ class UploadPage extends StatefulWidget {
 }
 
 class _UploadPageState extends State<UploadPage> {
-  List<File> _selectedImages = [];
-  List<Uint8List> _webImages = [];
+  List<XFile> _selectedFiles =
+      []; // Folosim XFile direct pentru a stoca și numele/extensia
   final ScrollController _scrollController = ScrollController();
   bool _isUploading = false;
 
@@ -1213,63 +1214,72 @@ class _UploadPageState extends State<UploadPage> {
     super.dispose();
   }
 
-  Future<void> _pickImages() async {
+  Future<void> _pickFiles() async {
     final picker = ImagePicker();
-    if (kIsWeb) {
-      final pickedFiles = await picker.pickMultiImage();
-      if (pickedFiles.isNotEmpty) {
-        final images = <Uint8List>[];
-        for (final file in pickedFiles) {
-          images.add(await file.readAsBytes());
-        }
-        setState(() {
-          _webImages = images;
-          _selectedImages = [];
-        });
-      }
-    } else {
-      final pickedFiles = await picker.pickMultiImage();
-      if (pickedFiles.isNotEmpty) {
-        setState(() {
-          _selectedImages = pickedFiles.map((e) => File(e.path)).toList();
-          _webImages = [];
-        });
-      }
+    // pickMultipleMedia permite selecția și de poze, și de video!
+    final pickedFiles = await picker.pickMultipleMedia();
+
+    if (pickedFiles.isNotEmpty) {
+      setState(() {
+        _selectedFiles = pickedFiles;
+      });
     }
   }
 
-  Future<void> _submitImages() async {
+  Future<void> _submitFiles() async {
     final uri = Uri.parse(const String.fromEnvironment('UPLOAD_URL',
-        defaultValue: 'https://YOUR_API/upload'));
+        defaultValue: 'https://YOUR_API_GATEWAY_URL/upload'));
+
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _isUploading = true);
 
     try {
-      var request = http.MultipartRequest('POST', uri);
-      if (kIsWeb) {
-        for (int i = 0; i < _webImages.length; i++) {
-          request.files.add(http.MultipartFile.fromBytes('files', _webImages[i],
-              filename: 'img_$i.jpg'));
+      for (int i = 0; i < _selectedFiles.length; i++) {
+        final file = _selectedFiles[i];
+        final fileBytes = await file.readAsBytes();
+        final fileName = file.name;
+
+        // Detectăm automat MIME tipul (ex: video/mp4, image/jpeg, etc.)
+        final mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
+
+        // 1. Cerem link-ul temporar de la AWS
+        final apiResponse = await http.post(
+          uri,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "fileName": fileName,
+            "contentType": mimeType,
+          }),
+        );
+
+        if (apiResponse.statusCode != 200) {
+          throw Exception('Eroare link temporar AWS.');
         }
-      } else {
-        for (int i = 0; i < _selectedImages.length; i++) {
-          request.files.add(await http.MultipartFile.fromPath(
-              'files', _selectedImages[i].path,
-              filename: 'img_$i.jpg'));
+
+        final responseData = jsonDecode(apiResponse.body);
+        final String uploadUrl = responseData['uploadUrl'];
+
+        // 2. Uploadăm efectiv fișierul (poză sau video) direct în S3
+        final s3Response = await http.put(
+          Uri.parse(uploadUrl),
+          headers: {
+            "Content-Type": mimeType,
+          },
+          body: fileBytes,
+        );
+
+        if (s3Response.statusCode != 200 && s3Response.statusCode != 204) {
+          throw Exception('Eroare upload S3.');
         }
       }
-      final response = await request.send();
+
       setState(() => _isUploading = false);
-      if (response.statusCode == 200) {
-        messenger.showSnackBar(const SnackBar(content: Text('Succes!')));
-        setState(() {
-          _selectedImages.clear();
-          _webImages.clear();
-        });
-      } else {
-        messenger.showSnackBar(
-            SnackBar(content: Text('Eroare: ${response.statusCode}')));
-      }
+      messenger.showSnackBar(const SnackBar(
+          content: Text('Succes! Fișierele au fost încărcate.')));
+
+      setState(() {
+        _selectedFiles.clear();
+      });
     } catch (e) {
       setState(() => _isUploading = false);
       messenger.showSnackBar(SnackBar(content: Text('Eroare: $e')));
@@ -1278,28 +1288,15 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool hasImages = _selectedImages.isNotEmpty || _webImages.isNotEmpty;
-    int imageCount = kIsWeb ? _webImages.length : _selectedImages.length;
+    bool hasFiles = _selectedFiles.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
-          title: Text('Redacția Foto',
+          title: Text('Redacția Foto & Video',
               style: GoogleFonts.cinzel(
                   fontSize: 22, fontWeight: FontWeight.bold)),
           centerTitle: true,
           backgroundColor: const Color(0xFFEFECE5)),
-      // TODO: in ziua nuntii -> porneste partea de upload
-      // body: Center(
-      //     child: Container(
-      //         constraints: const BoxConstraints(maxWidth: 600),
-      //         padding: const EdgeInsets.all(24),
-      //         child: Column(children: [
-      //           Text('Veți putea încărca fotografii în ziua evenimentului!',
-      //               textAlign: TextAlign.center,
-      //               style: GoogleFonts.playfairDisplay(
-      //                   fontSize: 20, fontWeight: FontWeight.bold)),
-      //           const SizedBox(height: 10),
-      //         ]))),
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 600),
@@ -1310,12 +1307,12 @@ class _UploadPageState extends State<UploadPage> {
                   style: GoogleFonts.playfairDisplay(
                       fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-              Text('Încărcați fotografiile aici.',
+              Text('Încărcați fotografiile și videoclipurile aici.',
                   textAlign: TextAlign.center,
                   style: GoogleFonts.lora(color: Colors.grey[700])),
               const SizedBox(height: 30),
               OutlinedButton.icon(
-                onPressed: _pickImages,
+                onPressed: _pickFiles, // Folosim noua funcție
                 icon: const Icon(Icons.folder_open, color: Colors.black),
                 label: const Text('SELECTEAZĂ',
                     style: TextStyle(color: Colors.black)),
@@ -1327,7 +1324,7 @@ class _UploadPageState extends State<UploadPage> {
                         horizontal: 30, vertical: 15)),
               ),
               const SizedBox(height: 20),
-              if (hasImages) ...[
+              if (hasFiles) ...[
                 SizedBox(
                   height: 120,
                   child: Scrollbar(
@@ -1336,18 +1333,28 @@ class _UploadPageState extends State<UploadPage> {
                     child: ListView.separated(
                       controller: _scrollController,
                       scrollDirection: Axis.horizontal,
-                      itemCount: imageCount,
+                      itemCount: _selectedFiles.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 12),
                       itemBuilder: (context, index) {
+                        final file = _selectedFiles[index];
+                        final mime = lookupMimeType(file.name) ?? '';
+                        final isVideo = mime.startsWith('video/');
+
                         return Container(
-                          padding: const EdgeInsets.all(4),
+                          width: 100,
+                          height: 100,
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.black)),
-                          child: kIsWeb
-                              ? Image.memory(_webImages[index],
-                                  width: 100, height: 100, fit: BoxFit.cover)
-                              : Image.file(_selectedImages[index],
-                                  width: 100, height: 100, fit: BoxFit.cover),
+                          // Aici decidem ce arătăm: poză sau iconiță de video
+                          child: isVideo
+                              ? const Center(
+                                  child: Icon(Icons.videocam,
+                                      size: 40, color: Colors.black54),
+                                )
+                              : kIsWeb
+                                  ? Image.network(file.path, fit: BoxFit.cover)
+                                  : Image.file(File(file.path),
+                                      fit: BoxFit.cover),
                         );
                       },
                     ),
@@ -1358,7 +1365,7 @@ class _UploadPageState extends State<UploadPage> {
                   const CircularProgressIndicator(color: Colors.black)
                 else
                   ElevatedButton.icon(
-                    onPressed: _submitImages,
+                    onPressed: _submitFiles,
                     icon: const Icon(Icons.send, color: Colors.white),
                     label: const Text('TRIMITE'),
                     style: ElevatedButton.styleFrom(
