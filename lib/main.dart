@@ -1646,20 +1646,23 @@ class _GridVideoPreviewState extends State<GridVideoPreview> {
       return const Center(
           child: CircularProgressIndicator(color: Colors.white));
     }
-    return Stack(
-      alignment: Alignment.center,
-      fit: StackFit.expand,
-      children: [
-        FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: _controller.value.size.width,
-            height: _controller.value.size.height,
-            child: VideoPlayer(_controller),
+    // AICI E SECRETUL: ClipRect taie excesul vizual care iese din cadru
+    return ClipRect(
+      child: Stack(
+        alignment: Alignment.center,
+        fit: StackFit.expand,
+        children: [
+          FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: _controller.value.size.width,
+              height: _controller.value.size.height,
+              child: VideoPlayer(_controller),
+            ),
           ),
-        ),
-        const Icon(Icons.play_circle_outline, color: Colors.white, size: 40),
-      ],
+          const Icon(Icons.play_circle_outline, color: Colors.white, size: 40),
+        ],
+      ),
     );
   }
 }
