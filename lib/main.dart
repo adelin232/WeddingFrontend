@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'map_helper_stub.dart' if (dart.library.html) 'map_helper_web.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:video_player/video_player.dart';
 import 'package:mime/mime.dart';
 
 void setupMape() {
@@ -1384,17 +1385,15 @@ class _UploadPageState extends State<UploadPage> {
 class GalleryPage extends StatelessWidget {
   const GalleryPage({super.key});
 
-  // Funcție helper pentru a deduce extensia din URL
   String _getExtension(String url) {
     final path = Uri.parse(url).path.toLowerCase();
     if (path.endsWith('.mp4')) return '.mp4';
     if (path.endsWith('.mov')) return '.mov';
     if (path.endsWith('.png')) return '.png';
     if (path.endsWith('.jpeg')) return '.jpeg';
-    return '.jpg'; // default fallback
+    return '.jpg';
   }
 
-  // Funcție helper pentru a verifica dacă e video
   bool _isVideo(String url) {
     final ext = _getExtension(url);
     return ext == '.mp4' || ext == '.mov';
@@ -1407,12 +1406,9 @@ class GalleryPage extends StatelessWidget {
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      if (data is Map && data['images'] is List) {
+      if (data is Map && data['images'] is List)
         return List<String>.from(data['images']);
-      }
-      if (data is List) {
-        return data.cast<String>();
-      }
+      if (data is List) return data.cast<String>();
       if (data is Map && data['photos'] is List) {
         return (data['photos'] as List)
             .where((photo) => photo is Map && photo['url'] != null)
@@ -1425,50 +1421,50 @@ class GalleryPage extends StatelessWidget {
     }
   }
 
+  // Logica de download regândită pentru a preveni blocarea aplicației (OOM - Out of Memory)
   Future<void> _downloadMedia(BuildContext context, String url) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+          content: Text('Se pregătește descărcarea...'),
+          duration: Duration(seconds: 2)),
+    );
+
+    final isVideo = _isVideo(url);
+
+    // PENTRU WEB SAU VIDEO:
+    // Evităm descărcarea în RAM a fișierelor mari. Delegăm sarcina către browser/sistem.
+    if (kIsWeb || isVideo) {
+      try {
+        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      } catch (e) {
+        if (context.mounted)
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Eroare la deschidere.')));
+      }
+      return;
+    }
+
+    // PENTRU IMAGINI PE TELEFON (Mobile):
+    // Pozele sunt mici, deci e sigur să le descărcăm și să le dăm share.
     try {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Se încearcă descărcarea...'),
-            duration: Duration(seconds: 2)),
-      );
-
-      // IMPORTANT: Am eliminat cacheBusterUrl deoarece strică AWS Pre-signed URLs
       final response = await http.get(Uri.parse(url));
-
       if (response.statusCode == 200) {
         final Uint8List bytes = response.bodyBytes;
         final timestamp = DateTime.now().millisecondsSinceEpoch;
         final ext = _getExtension(url);
-        final String fileName = "nunta_andreea_adelin_$timestamp$ext";
 
-        if (kIsWeb) {
-          // Aici trebuie să apelezi funcția ta JS/Web de download
-          // downloadWeb(bytes, fileName);
-        } else {
-          final tempDir = await getTemporaryDirectory();
-          final file = File('${tempDir.path}/$fileName');
-          await file.writeAsBytes(bytes);
-          await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
-        }
+        final tempDir = await getTemporaryDirectory();
+        final file =
+            File('${tempDir.path}/nunta_andreea_adelin_$timestamp$ext');
+        await file.writeAsBytes(bytes);
+        await Share.shareXFiles([XFile(file.path)], text: 'Amintire Nuntă');
       } else {
-        throw 'Serverul a refuzat conexiunea (Status: ${response.statusCode}).';
+        throw 'Eroare HTTP: ${response.statusCode}';
       }
     } catch (e) {
-      debugPrint("Eroare download inteligent ($e). Se trece la Planul B.");
-
-      try {
-        await launchUrl(
-          Uri.parse(url),
-          mode: LaunchMode.externalApplication,
-        );
-      } catch (e2) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Nu s-a putut deschide fișierul.')),
-          );
-        }
-      }
+      if (context.mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Eroare: $e')));
     }
   }
 
@@ -1535,31 +1531,10 @@ class GalleryPage extends StatelessWidget {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
+                              // AICI e player-ul embedded pentru popup
                               Expanded(
                                   child: isVideo
-                                      ? Center(
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(Icons.play_circle_fill,
-                                                  size: 80,
-                                                  color: Colors.black54),
-                                              const SizedBox(height: 20),
-                                              OutlinedButton.icon(
-                                                onPressed: () => launchUrl(
-                                                    Uri.parse(url),
-                                                    mode: LaunchMode
-                                                        .externalApplication),
-                                                icon: const Icon(
-                                                    Icons.open_in_browser,
-                                                    color: Colors.black),
-                                                label: const Text('VEZI VIDEO',
-                                                    style: TextStyle(
-                                                        color: Colors.black)),
-                                              )
-                                            ],
-                                          ),
-                                        )
+                                      ? DialogVideoPlayer(url: url)
                                       : Image.network(url,
                                           fit: BoxFit.contain)),
                               const SizedBox(height: 10),
@@ -1567,7 +1542,7 @@ class GalleryPage extends StatelessWidget {
                                   onPressed: () => _downloadMedia(context, url),
                                   icon: const Icon(Icons.download,
                                       size: 16, color: Colors.white),
-                                  label: const Text("DESCARCĂ"),
+                                  label: const Text("DESCARCĂ / DESCHIDE"),
                                   style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.black,
                                       foregroundColor: Colors.white,
@@ -1600,17 +1575,17 @@ class GalleryPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // AICI e preview-ul pentru grid
                       Expanded(
                           child: Container(
-                              color: Colors.grey[100],
+                              color: Colors.black,
                               child: isVideo
-                                  ? const Center(
-                                      child: Icon(Icons.videocam,
-                                          size: 40, color: Colors.black54))
+                                  ? GridVideoPreview(url: url)
                                   : Image.network(url,
                                       fit: BoxFit.cover,
                                       errorBuilder: (ctx, err, stack) =>
-                                          const Icon(Icons.broken_image)))),
+                                          const Icon(Icons.broken_image,
+                                              color: Colors.white)))),
                       const SizedBox(height: 8),
                       Text(isVideo ? 'Video ${index + 1}' : 'Foto ${index + 1}',
                           textAlign: TextAlign.center,
@@ -1625,6 +1600,133 @@ class GalleryPage extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// WIDGET-URI NOI PENTRU REDARE VIDEO (Preview și Full)
+// ============================================================================
+
+class GridVideoPreview extends StatefulWidget {
+  final String url;
+  const GridVideoPreview({super.key, required this.url});
+
+  @override
+  State<GridVideoPreview> createState() => _GridVideoPreviewState();
+}
+
+class _GridVideoPreviewState extends State<GridVideoPreview> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+          });
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.white));
+    }
+    return Stack(
+      alignment: Alignment.center,
+      fit: StackFit.expand,
+      children: [
+        FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width,
+            height: _controller.value.size.height,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+        const Icon(Icons.play_circle_outline, color: Colors.white, size: 40),
+      ],
+    );
+  }
+}
+
+class DialogVideoPlayer extends StatefulWidget {
+  final String url;
+  const DialogVideoPlayer({super.key, required this.url});
+
+  @override
+  State<DialogVideoPlayer> createState() => _DialogVideoPlayerState();
+}
+
+class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+      ..initialize().then((_) {
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+          });
+          _controller.play(); // Auto-play la deschiderea popup-ului
+          _controller.setLooping(true);
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.pause();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_initialized) {
+      return const Center(
+          child: CircularProgressIndicator(color: Colors.black));
+    }
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _controller.value.isPlaying
+              ? _controller.pause()
+              : _controller.play();
+        });
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+          if (!_controller.value.isPlaying)
+            Container(
+              decoration: const BoxDecoration(
+                  color: Colors.black45, shape: BoxShape.circle),
+              child:
+                  const Icon(Icons.play_arrow, color: Colors.white, size: 60),
+            ),
+        ],
       ),
     );
   }
