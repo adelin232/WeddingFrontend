@@ -1679,6 +1679,7 @@ class _GridVideoPreviewState extends State<GridVideoPreview> {
   }
 }
 
+// 1. Clasa care inițializează controller-ul și o afișează în popup
 class DialogVideoPlayer extends StatefulWidget {
   final String url;
   const DialogVideoPlayer({super.key, required this.url});
@@ -1705,7 +1706,6 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
         }
       });
 
-    // Ascultăm schimbările ca să se actualizeze în timp real cronometrul și bara
     _controller.addListener(() {
       if (mounted) setState(() {});
     });
@@ -1718,24 +1718,6 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
     super.dispose();
   }
 
-  void _togglePlay() {
-    setState(() {
-      if (_controller.value.isPlaying) {
-        _controller.pause();
-      } else {
-        _controller.play();
-      }
-    });
-  }
-
-  // Funcție pentru a transforma secundele în format 00:00
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, "0");
-    String minutes = twoDigits(duration.inMinutes.remainder(60));
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
-    return "$minutes:$seconds";
-  }
-
   @override
   Widget build(BuildContext context) {
     if (!_initialized) {
@@ -1745,101 +1727,187 @@ class _DialogVideoPlayerState extends State<DialogVideoPlayer> {
 
     return AspectRatio(
       aspectRatio: _controller.value.aspectRatio,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque, // <--- ACEASTA ESTE SOLUȚIA
-        onTap: _togglePlay, // Click oriunde = Play/Pauză
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // 1. Videoclipul de fundal
-            VideoPlayer(_controller),
+      // Folosim interfața custom creată mai jos
+      child: CustomVideoPlayerUI(controller: _controller, isFullScreen: false),
+    );
+  }
+}
 
-            // 2. Iconița centrală elegantă (apare doar pe pauză)
-            AnimatedOpacity(
-              opacity: _controller.value.isPlaying ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: Colors.black54, shape: BoxShape.circle),
-                padding: const EdgeInsets.all(16),
-                child:
-                    const Icon(Icons.play_arrow, color: Colors.white, size: 50),
-              ),
-            ),
+// 2. Interfața Player-ului (Gestionează click-urile corect și Fullscreen-ul)
+class CustomVideoPlayerUI extends StatefulWidget {
+  final VideoPlayerController controller;
+  final bool isFullScreen; // Știe dacă e deja pe tot ecranul
 
-            // 3. Bara de controale jos de tot
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                // Un mic gradient transparent jos de tot doar cat să se vadă textul alb
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.black87],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                )),
-                child: Row(
-                  children: [
-                    // Timp scurs
-                    Text(
-                      _formatDuration(_controller.value.position),
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontFamily: 'monospace'),
-                    ),
-                    const SizedBox(width: 10),
+  const CustomVideoPlayerUI({
+    super.key,
+    required this.controller,
+    required this.isFullScreen,
+  });
 
-                    // Bara de progres (click & drag)
-                    Expanded(
-                      child: VideoProgressIndicator(
-                        _controller,
-                        allowScrubbing: true,
-                        colors: const VideoProgressColors(
-                          playedColor: Colors.white,
-                          backgroundColor: Colors.white38,
-                          bufferedColor: Colors.white54,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
+  @override
+  State<CustomVideoPlayerUI> createState() => _CustomVideoPlayerUIState();
+}
 
-                    // Timp total
-                    Text(
-                      _formatDuration(_controller.value.duration),
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontFamily: 'monospace'),
-                    ),
-                    const SizedBox(width: 8),
+class _CustomVideoPlayerUIState extends State<CustomVideoPlayerUI> {
+  void _togglePlay() {
+    setState(() {
+      if (widget.controller.value.isPlaying) {
+        widget.controller.pause();
+      } else {
+        widget.controller.play();
+      }
+    });
+  }
 
-                    // Buton de Mute / Unmute
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _controller.setVolume(
-                              _controller.value.volume > 0 ? 0.0 : 1.0);
-                        });
-                      },
-                      child: Icon(
-                          _controller.value.volume > 0
-                              ? Icons.volume_up
-                              : Icons.volume_off,
-                          color: Colors.white,
-                          size: 20),
-                    )
-                  ],
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$minutes:$seconds";
+  }
+
+  void _toggleFullScreen() {
+    if (widget.isFullScreen) {
+      // Dacă suntem în fullscreen, închidem pagina de fullscreen
+      Navigator.pop(context);
+    } else {
+      // Dacă suntem în popup, deschidem o pagină nouă neagră pe tot ecranul
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Scaffold(
+            backgroundColor: Colors.black,
+            body: SafeArea(
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: widget.controller.value.aspectRatio,
+                  child: CustomVideoPlayerUI(
+                    controller: widget.controller,
+                    isFullScreen: true,
+                  ),
                 ),
               ),
             ),
-          ],
+          ),
         ),
-      ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // STRATUL 1: Videoclipul efectiv (la bază)
+        VideoPlayer(widget.controller),
+
+        // STRATUL 2: "Geamul" transparent care interceptează click-urile pentru web
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: _togglePlay,
+            child: Container(color: Colors.transparent),
+          ),
+        ),
+
+        // STRATUL 3: Iconița de Play/Pause pe centru
+        // Folosim IgnorePointer pentru ca click-ul pe ea să treacă prin geamul de la Stratul 2
+        IgnorePointer(
+          child: AnimatedOpacity(
+            opacity: widget.controller.value.isPlaying ? 0.0 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: Colors.black54, shape: BoxShape.circle),
+              padding: const EdgeInsets.all(16),
+              child:
+                  const Icon(Icons.play_arrow, color: Colors.white, size: 50),
+            ),
+          ),
+        ),
+
+        // STRATUL 4: Bara de controale jos de tot
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: const BoxDecoration(
+                gradient: LinearGradient(
+              colors: [Colors.transparent, Colors.black87],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            )),
+            child: Row(
+              children: [
+                // Timp scurs
+                Text(
+                  _formatDuration(widget.controller.value.position),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontFamily: 'monospace'),
+                ),
+                const SizedBox(width: 10),
+
+                // Bara de progres (poți da skip)
+                Expanded(
+                  child: VideoProgressIndicator(
+                    widget.controller,
+                    allowScrubbing: true,
+                    colors: const VideoProgressColors(
+                      playedColor: Colors.white,
+                      backgroundColor: Colors.white38,
+                      bufferedColor: Colors.white54,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+
+                // Timp total
+                Text(
+                  _formatDuration(widget.controller.value.duration),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontFamily: 'monospace'),
+                ),
+                const SizedBox(width: 8),
+
+                // Buton Mute/Unmute
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      widget.controller.setVolume(
+                          widget.controller.value.volume > 0 ? 0.0 : 1.0);
+                    });
+                  },
+                  child: Icon(
+                      widget.controller.value.volume > 0
+                          ? Icons.volume_up
+                          : Icons.volume_off,
+                      color: Colors.white,
+                      size: 20),
+                ),
+                const SizedBox(width: 12),
+
+                // Buton FullScreen
+                GestureDetector(
+                  onTap: _toggleFullScreen,
+                  child: Icon(
+                    widget.isFullScreen
+                        ? Icons.fullscreen_exit
+                        : Icons.fullscreen,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
